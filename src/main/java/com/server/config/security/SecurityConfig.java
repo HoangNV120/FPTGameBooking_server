@@ -34,6 +34,40 @@ public class SecurityConfig {
     private final AuthAccessDeniedJwt authAccessDeniedJwt;
     private final JwtUtils jwtUtils;
 
+    private final String[] PUBLIC_ENDPOINTS = {
+            "/api/v1/auth/login",
+            "/api/v1/auth/register",
+            "/api/v1/auth/forgot-password",
+            "/api/v1/auth/reset-password",
+            "/api/v1/auth/verify-email",
+            "/api/v1/auth/refresh-token",
+            "/api/v1/auth/logout"};
+
+    private final String[] SWAGGER_ENDPOINTS = {
+            "/v2/api-docs",
+            "/swagger-resources/**",
+            "/swagger-ui/**",
+            "/webjars/**",
+            "/swagger-ui.html",
+            "/v3/api-docs/**"
+    };
+
+    private final String[] WEBSOCKET_ENDPOINTS = {
+            "/ws/**",
+            "/api/our-websocket/**",
+            "/chat/**"
+    };
+
+    private final String[] USER_ENDPOINTS = {
+            "/api/v1/user/**"
+    };
+    private final String[] ADMIN_ENDPOINTS = {
+            "/api/v1/admin/**"
+    };
+
+
+
+
 
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -49,10 +83,9 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
-                        .requestMatchers("/ws/**").permitAll()
-                        .requestMatchers("/v2/**", "/swagger-ui/**").permitAll()
-                        .requestMatchers("/chat/**").permitAll()
-                        .requestMatchers("/api/our-websocket/**").permitAll()
+                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(WEBSOCKET_ENDPOINTS).permitAll()
+                        .requestMatchers(SWAGGER_ENDPOINTS).permitAll()
                         .requestMatchers("/api/v1/user/**").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/game/**").permitAll()
@@ -62,7 +95,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/message/**").permitAll()
                         .requestMatchers("/api/v1/transactions/**").permitAll()
                         .requestMatchers("/api/v1/user-team/**").permitAll()
-                        .requestMatchers("/api/v1/admin/**").hasAnyRole("ADMIN")
+                        .requestMatchers(ADMIN_ENDPOINTS).hasAnyRole("ADMIN")
                         .anyRequest().authenticated());
 
         http .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -100,6 +133,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH"));
         configuration.addAllowedOrigin("http://157.66.27.80:3000");
+        configuration.addAllowedOrigin("https://fptgamebooking.vn");
         configuration.addAllowedOrigin("http://localhost:3000");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);

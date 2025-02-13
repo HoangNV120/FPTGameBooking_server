@@ -177,7 +177,7 @@ public class AuthServiceImpl implements AuthService {
         String password = new RandomGenerator().randomToString();
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
-        emailService.sendEmail(email, password);
+        emailService.sendEmailForgotPassword(email, password);
 
         return "Quên thành công";
     }

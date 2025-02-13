@@ -14,6 +14,6 @@ public class TransactionRequest {
     private String userId;
     private String bank;
     private String consumerId;
-    @NotBlank(message = "amount  không để trống")
+    @NotBlank(message = "Số tiền không để trống")
     private String amount;
 }

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Nạp Point</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Roboto', sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .error-icon {
+            margin: 30px auto;
+            width: 80px;
+            height: 80px;
+            background-color: #fee2e2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #dc2626;
+        }
+
+        .error-icon::before {
+            content: "✕";
+        }
+
+        .error-message {
+            text-align: center;
+            color: #dc2626;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .transaction-time {
+            text-align: center;
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: #4b5563;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .highlight {
+            color: #dc2626;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .notice {
+            background-color: #fee2e2;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #991b1b;
+            font-size: 14px;
+        }
+
+        .support-info {
+            margin-top: 20px;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .support-info p {
+            color: #6b7280;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        .social-links {
+            margin-top: 15px;
+        }
+
+        .social-links a {
+            color: #2563eb;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .social-links a:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            padding: 20px;
+            background-color: #f8f9fa;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        @media screen and (max-width: 600px) {
+            .container {
+                margin: 20px;
+                width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Nạp Point Thất Bại</h1>
+    </div>
+
+    <div class="content">
+        <div class="error-icon"></div>
+        <div class="error-message">Giao dịch không thành công!</div>
+
+        <div class="transaction-time">
+            Thời gian giao dịch: <span th:text="${time}"></span>
+        </div>
+
+        <div class="info-box">
+            <div class="info-item">
+                <span class="info-label">Mã Giao Dịch:</span>
+                <span class="info-value" th:text="${transactionId}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Tên Người Dùng:</span>
+                <span class="info-value" th:text="${name}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Email:</span>
+                <span class="info-value" th:text="${email}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Số Point Nạp:</span>
+                <span class="info-value highlight" th:text="${point + ' points'}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Số Tiền:</span>
+                <span class="info-value highlight" th:text="${amount}"></span>
+            </div>
+        </div>
+
+        <div class="notice">
+            <strong>Lưu ý:</strong> Giao dịch của bạn chưa được hoàn tất. Vui lòng kiểm tra lại thông tin thanh toán hoặc liên hệ với chúng tôi để được hỗ trợ.
+        </div>
+
+        <div class="support-info">
+            <p>Nếu bạn cần hỗ trợ, vui lòng liên hệ với chúng tôi qua:</p>
+            <p>Email: <a href="mailto:ductn42@gmail.com">ductn42@gmail.com</a></p>
+            <div class="social-links">
+                <p>Hoặc theo dõi chúng tôi tại:</p>
+                <a href="https://www.facebook.com/profile.php?id=61572925261949" target="_blank">Facebook</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
+        <p>© 2025 FPT GameBooking. All rights reserved.</p>
+    </div>
+</div>
+</body>
+</html>

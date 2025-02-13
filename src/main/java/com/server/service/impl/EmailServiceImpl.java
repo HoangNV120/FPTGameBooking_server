@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,10 +22,37 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    public void sendEmail(String email, String password) {
+    public void sendEmailForgotPassword(String email, String password) {
         Map<String, Object> modeMap = new HashMap<>();
         modeMap.put("email", email);
         modeMap.put("password", password);
-        sendEmailServiceConfig.sendEmailPassword(email, password, modeMap, "SendEmailPassword");
+        sendEmailServiceConfig.sendEmail(email, password, modeMap, "SendEmailPassword");
+    }
+    @Async
+    @Override
+    public void sendEmailPurchasePointRequest(String time,String adminEmail, String transactionId, String userId,
+                                              String userEmail, String name, int point, String amount) {
+        Map<String, Object> modeMap = new HashMap<>();
+        modeMap.put("time", time);
+        modeMap.put("transactionId", transactionId);
+        modeMap.put("userId", userId);
+        modeMap.put("email", userEmail);
+        modeMap.put("name", name);
+        modeMap.put("point", String.valueOf(point));
+        modeMap.put("amount", amount);
+        sendEmailServiceConfig.sendEmail(adminEmail, "Purchase Point Request", modeMap, "PurchasePointRequest");
+    }
+
+    @Override
+    public void sendEmailPurchasePointResult(String time, String transactionId, String email, String name, int point,
+                                             String amount, String subject, String template) {
+        Map<String, Object> modeMap = new HashMap<>();
+        modeMap.put("time", time);
+        modeMap.put("transactionId", transactionId);
+        modeMap.put("email", email);
+        modeMap.put("name", name);
+        modeMap.put("point", String.valueOf(point));
+        modeMap.put("amount", amount);
+        sendEmailServiceConfig.sendEmail(email, subject, modeMap, template);
     }
 }

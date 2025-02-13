@@ -13,7 +13,10 @@ import com.server.exceptions.NotFoundExceptionHandler;
 import com.server.exceptions.RestApiException;
 import com.server.repository.TransactionRepository;
 import com.server.repository.UserRepository;
+import com.server.service.EmailService;
 import com.server.service.TransactionService;
+import com.server.service.UserService;
+import com.server.util.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -22,6 +25,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +39,8 @@ public class TransactionServiceImpl implements TransactionService {
     private final UserRepository userRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final ModelMapper modelMapper;
+    private final EmailService emailService;
+    private final UserService userService;
 
     @Override
     public TransactionResponse addTransaction(TransactionRequest request) {
@@ -57,11 +64,24 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setTransactionStatus(TransactionEnum.PENDING);
         transaction.setPoint(pointsToAdd);
 
-        TransactionResponse response = convertTransaction(transactionRepository.save(transaction));
+        // Lưu giao dịch
+        Transaction savedTransaction = transactionRepository.save(transaction);
+        TransactionResponse response = convertTransaction(savedTransaction);
+
+        // Gửi thông báo qua WebSocket
         simpMessagingTemplate.convertAndSend(
                 "/subscribe/payment-confirmation-admin/" + optionalAdmin.get().getId(),
                 new ResponseGlobal<>(response)
         );
+
+        String time = DateUtils.convertToString(LocalDateTime.now());
+        String userEmail = optionalUser.get().getEmail();
+        String adminEmail = optionalAdmin.get().getEmail();
+        String name = userService.findByEmail(userEmail).getName();
+        String amount = new DecimalFormat("#,### VNĐ").format(new BigDecimal(request.getAmount()));
+        // Gửi email thông báo cho admin
+        emailService.sendEmailPurchasePointRequest(time, adminEmail, savedTransaction.getId(),request.getUserId(),
+                userEmail, name, pointsToAdd, amount);
 
         return response;
     }
@@ -94,12 +114,25 @@ public class TransactionServiceImpl implements TransactionService {
                     "/subscribe/payment-confirmation-success/" + transaction.getUserApprove().getId(),
                     new ResponseGlobal<>(response)
             );
+
+            // Gửi email thông báo cho người dùng
+            emailService.sendEmailPurchasePointResult(DateUtils.convertToString(LocalDateTime.now()), transaction.getId(),
+                    user.getEmail(), user.getName(), pointsToAdd,
+                    new DecimalFormat("#,### VNĐ").format(transaction.getAmount()),
+                    "Giao dịch thành công", "PurchasePointSuccess");
+
         } else if (TransactionEnum.CANCELLED.equals(transaction.getTransactionStatus())) {
             // Gửi thông báo qua WebSocket khi giao dịch bị hủy
             simpMessagingTemplate.convertAndSend(
                     "/subscribe/payment-confirmation-cancelled/" + transaction.getUserApprove().getId(),
                     new ResponseGlobal<>(response)
             );
+
+            // Gửi email thông báo cho người dùng
+            emailService.sendEmailPurchasePointResult(DateUtils.convertToString(LocalDateTime.now()), transaction.getId(),
+                    transaction.getUserApprove().getEmail(), transaction.getUserApprove().getName(), transaction.getPoint(),
+                    new DecimalFormat("#,### VNĐ").format(transaction.getAmount()),
+                    "Giao dịch thất bại", "PurchasePointFailed");
         }
 
         return response;

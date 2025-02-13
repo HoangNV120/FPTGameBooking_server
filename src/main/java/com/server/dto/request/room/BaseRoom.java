@@ -23,23 +23,23 @@ public abstract class BaseRoom {
     @Size(min = 3, max = 50, message = "codeGame phải có từ 3 đến 50 ký tự")
     private String codeGame;
 
-    @NotBlank(message = "name không để trống")
+    @NotBlank(message = "Tên phòng không để trống")
     private String name;
 
     private Integer pointBetLevel;
 
-    @NotNull(message = "rankPlayer không để trống")
+    @NotNull(message = "Rank không để trống")
     private List<RankEnum> rankPlayer;
 
-    @NotNull(message = "playerModes không để trống.")
+    @NotNull(message = "Chế độ chơi không để trống.")
     private List<PlayerModeEnum> playerModes;
 
-    @NotNull(message = "startDate không để trống.")
+    @NotNull(message = "Thời gian không để trống.")
     private LocalDateTime startDate;
 
     private LocalDateTime endDate;
 
-    @NotBlank(message = "description không để trống.")
+    @NotBlank(message = "Mô tả không để trống.")
     private String description;
 
     private LevelRoomEnum level;

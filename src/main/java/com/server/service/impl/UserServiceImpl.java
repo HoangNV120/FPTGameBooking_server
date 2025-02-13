@@ -19,11 +19,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -47,8 +52,28 @@ public class UserServiceImpl implements UserService {
     public PageableObject<UserResponse> findAll(FindUserRequest request) {
         log.info("Find all user request: {}", request);
 
-        // Chưa thực hiện tìm kiếm và phân trang, trả về null tạm thời.
-        return null;
+        Page<User> userPage;
+
+        // Áp dụng bộ lọc dựa trên yêu cầu
+        if (request.getName() != null && !request.getName().isEmpty()) {
+            userPage = userRepository.findByNameContaining(request.getName(), PageRequest.of(request.getPageNo(), request.getPageSize()));
+        } else if (request.getEmail() != null && !request.getEmail().isEmpty()) {
+            userPage = userRepository.findByEmailContaining(request.getEmail(), PageRequest.of(request.getPageNo(), request.getPageSize()));
+        } else {
+            // Nếu không có bộ lọc, lấy tất cả người dùng với phân trang
+            userPage = userRepository.findAll(PageRequest.of(request.getPageNo(), request.getPageSize()));
+        }
+
+        // Dùng ModelMapper để chuyển đổi từ User entity sang UserResponse DTO
+        List<UserResponse> userResponses = userPage.getContent().stream()
+                .map(user -> modelMapper.map(user, UserResponse.class))
+                .collect(Collectors.toList());
+
+        Page<UserResponse> page = new PageImpl<>(userResponses,
+                PageRequest.of(request.getPageNo(), request.getPageSize()),
+                userPage.getTotalElements());
+
+        return new PageableObject<>(page);
     }
 
     /**
@@ -97,7 +122,6 @@ public class UserServiceImpl implements UserService {
         User update = new User();
         update.setEmail(req.getEmail());
         update.setName(req.getName());
-        update.setPoint(0);
         update.setLevel(LevelEnum.fromString(req.getLevel()));
         update.setRole(RoleEnum.fromString(req.getRole()));
         update.setStatus(StatusEnum.ACTIVE);

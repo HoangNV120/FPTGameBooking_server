@@ -40,5 +40,10 @@ public class DateUtils {
         return localDate.atStartOfDay();
     }
 
+    public static String convertToString(LocalDateTime localDateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        return localDateTime.format(formatter);
+    }
+
 
 }

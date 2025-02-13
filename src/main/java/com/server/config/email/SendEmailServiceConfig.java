@@ -31,7 +31,7 @@ public class SendEmailServiceConfig {
     private String sender;
 
     @Async
-    public CompletableFuture<Boolean> sendEmailPassword(String to, String subject,
+    public CompletableFuture<Boolean> sendEmail(String to, String subject,
                                                         Map<String, Object> model, String templateName) {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();

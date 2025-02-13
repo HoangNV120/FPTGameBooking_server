@@ -61,5 +61,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         return jwt;
     }
 
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs") ||
+                path.startsWith("/swagger-resources") || path.startsWith("/webjars");
+    }
+
 
 }
