@@ -104,6 +104,11 @@ public class RoomServiceImpl implements RoomService {
             countSql.append(" AND r.name LIKE :name");
         }
 
+        if (StringUtils.isNotEmpty(request.getNameUser())) {
+            sql.append(" AND r.nameUser LIKE :nameUser");
+            countSql.append(" AND r.nameUser LIKE :nameUser");
+        }
+
         if (ObjectUtils.isNotEmpty(request.getLevel())) {
             sql.append(" AND r.level = :level");
             countSql.append(" AND r.level = :level");
@@ -129,6 +134,16 @@ public class RoomServiceImpl implements RoomService {
         if (StringUtils.isNotEmpty(request.getName())) {
             query.setParameter("name", "%" + request.getName() + "%");
             countQuery.setParameter("name", "%" + request.getName() + "%");
+        }
+
+        if (StringUtils.isNotEmpty(request.getNameUser())) {
+            sql.append(" AND r.nameUser LIKE :nameUser");
+            countSql.append(" AND r.nameUser LIKE :nameUser");
+        }
+
+        if (StringUtils.isNotEmpty(request.getNameUser())) {
+            query.setParameter("nameUser", "%" + request.getNameUser() + "%");
+            countQuery.setParameter("nameUser", "%" + request.getNameUser() + "%");
         }
 
         if (ObjectUtils.isNotEmpty(request.getLevel())) {

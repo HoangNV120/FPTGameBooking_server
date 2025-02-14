@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 public class FindRoomRequest extends PageableRequest {
     private String infoUser;
     private String codeGame;
-    private String nameUser;
     private String name;
     private String code;
     private String password;

@@ -12,7 +12,7 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserMessageResponse {
+public class UserMinimalResponse  {
     private String id;
     private String name;
     private LevelEnum level;

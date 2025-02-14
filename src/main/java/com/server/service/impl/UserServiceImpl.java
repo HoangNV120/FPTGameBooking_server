@@ -169,6 +169,5 @@ public class UserServiceImpl implements UserService {
 
         return convertUser(user);
     }
-
 }
 

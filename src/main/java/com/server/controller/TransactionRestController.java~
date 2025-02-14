@@ -54,7 +54,7 @@ public class TransactionRestController {
     }
 
     @PostMapping("/search")
-    public ResponseGlobal<PageableObject<TransactionResponse>> viewTransaction(@RequestBody FindTransactionRequest request) {
+    public ResponseGlobal<PageableObject<TransactionResponse>> searchTransaction(@Valid @RequestBody FindTransactionRequest request) {
         log.info("findTransaction: request = {}", request.toString());
         return new ResponseGlobal<>(transactionService.searchTransaction(request));
     }

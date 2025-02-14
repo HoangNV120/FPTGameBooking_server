@@ -77,7 +77,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
-        http.cors(cors -> corsConfigurationSource());
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
         http.addFilterBefore(authenticationJwtTokenFilter(),
                 UsernamePasswordAuthenticationFilter.class);
 
@@ -94,6 +94,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/team/**").permitAll()
                         .requestMatchers("/api/v1/message/**").permitAll()
                         .requestMatchers("/api/v1/transactions/**").permitAll()
+                        .requestMatchers("/api/v1/transactions/search").permitAll()
                         .requestMatchers("/api/v1/user-team/**").permitAll()
                         .requestMatchers(ADMIN_ENDPOINTS).hasAnyRole("ADMIN")
                         .anyRequest().authenticated());
@@ -131,14 +132,16 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH"));
-        configuration.addAllowedOrigin("http://157.66.27.80:3000");
-        configuration.addAllowedOrigin("https://fptgamebooking.vn");
-        configuration.addAllowedOrigin("http://localhost:3000");
-        configuration.addAllowedHeader("*");
+        configuration.setAllowedOrigins(Arrays.asList("https://fptgamebooking.vn", "http://localhost:3000")); // Đảm bảo đúng domain
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 }
