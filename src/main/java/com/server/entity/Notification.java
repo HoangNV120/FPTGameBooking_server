@@ -1,16 +1,9 @@
 package com.server.entity;
 
 import com.server.entity.common.AuditTable;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.server.enums.NotificationEnum;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Getter
 @Setter
@@ -18,12 +11,21 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table
+@Table(name = "notification")
 public class Notification extends AuditTable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
     private String senderId;
     private String content;
+    private String type;
+
+    @ManyToOne
+    @JoinColumn(name = "id_user")
+    private User user;  // Người nhận thông báo
+
+    @Enumerated(EnumType.STRING)
+    private NotificationEnum statusNotification;
 }

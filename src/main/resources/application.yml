@@ -50,3 +50,7 @@ logging:
       hibernate:
         SQL: DEBUG
 
+cloudinary:
+    cloudName: "db8h1vnhj"
+    apiKey: "652637162123458"
+    apiSecret: "9zLG59ruEvs4KlMzpxT1FFd4xEg"

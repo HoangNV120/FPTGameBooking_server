@@ -1,10 +1,13 @@
 package com.server.service.impl;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.server.constants.Constants;
 import com.server.dto.request.user.CreateUserRequest;
 import com.server.dto.request.user.FindUserRequest;
 import com.server.dto.request.user.UpdateUserRequest;
 import com.server.dto.response.common.PageableObject;
+import com.server.dto.response.user.UserImageResponse;
 import com.server.dto.response.user.UserResponse;
 import com.server.entity.User;
 import com.server.enums.LevelEnum;
@@ -25,8 +28,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -41,6 +47,7 @@ public class UserServiceImpl implements UserService {
     private final EntityManager entityManager;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
+    private final Cloudinary cloudinary;
 
     /**
      * Tìm tất cả người dùng dựa trên yêu cầu tìm kiếm.
@@ -168,6 +175,43 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new NotFoundExceptionHandler("Người dùng không tồn tại."));
 
         return convertUser(user);
+    }
+
+    /**
+     * Tải lên một hình ảnh lên Cloudinary.
+     *
+     * @param file Hình ảnh cần tải lên.
+     * @param publicId ID công khai của hình ảnh.
+     * @return URL của hình ảnh đã tải lên.
+     * @throws IOException Nếu có lỗi trong quá trình tải lên.
+     */
+
+    @Override
+    public UserImageResponse uploadImage(MultipartFile file, String publicId) throws IOException {
+        // Xóa ảnh cũ trước khi upload (nếu tồn tại)
+        deleteImage(publicId);
+
+        // Upload ảnh mới
+        Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
+                ObjectUtils.asMap("public_id", publicId));
+
+        // Lấy thông tin người dùng từ ID công khai
+        User user = userRepository.findById(publicId)
+                .orElseThrow(() -> new NotFoundExceptionHandler("Người dùng không tồn tại."));
+
+        // Cập nhật ảnh đại diện của người dùng
+        user.setAvatar(uploadResult.get("secure_url").toString());
+        userRepository.save(user);
+
+        return new UserImageResponse(  uploadResult.get("secure_url").toString());
+    }
+
+    private void deleteImage(String publicId) {
+        try {
+            cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+        } catch (Exception e) {
+            System.out.println("Không thể xóa ảnh cũ: " + e.getMessage());
+        }
     }
 }
 

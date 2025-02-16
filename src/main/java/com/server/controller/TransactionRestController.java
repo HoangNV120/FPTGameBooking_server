@@ -4,6 +4,7 @@ import com.server.dto.request.transaction.FindTransactionRequest;
 import com.server.dto.request.transaction.TransactionRequest;
 import com.server.dto.response.common.PageableObject;
 import com.server.dto.response.common.ResponseGlobal;
+import com.server.dto.response.transaction.TransactionMinimalResponse;
 import com.server.dto.response.transaction.TransactionResponse;
 import com.server.service.QrGenerateService;
 import com.server.service.TransactionService;
@@ -46,11 +47,17 @@ public class TransactionRestController {
         return new ResponseGlobal<>(transactionService.findByTransactionByStatus(status));
     }
 
-    @PutMapping
+    @PutMapping("/update-transaction")
     public ResponseGlobal<TransactionResponse> updateTransaction(@RequestParam("id") String id,
                                                                  @RequestParam("status") String status) {
         log.info("updateTransaction: id = {}, status = {}", id, status);
         return new ResponseGlobal<>(transactionService.paymentConfirmation(id, status));
+    }
+
+    @PostMapping("/search-by-id")
+    public ResponseGlobal<PageableObject<TransactionMinimalResponse>> viewTransactionById(@RequestBody FindTransactionRequest request) {
+        log.info("findTransaction: request = {}", request.toString());
+        return new ResponseGlobal<>(transactionService.searchTransactionById(request));
     }
 
     @PostMapping("/search")

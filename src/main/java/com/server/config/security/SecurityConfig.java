@@ -35,13 +35,13 @@ public class SecurityConfig {
     private final JwtUtils jwtUtils;
 
     private final String[] PUBLIC_ENDPOINTS = {
-            "/api/v1/auth/login",
-            "/api/v1/auth/register",
+            "/api/v1/auth/sign-in",
+            "/api/v1/auth/sign-up",
             "/api/v1/auth/forgot-password",
-            "/api/v1/auth/reset-password",
             "/api/v1/auth/verify-email",
             "/api/v1/auth/refresh-token",
-            "/api/v1/auth/logout"};
+            "/api/v1/auth/logout",
+            "/api/v1/game/**"};
 
     private final String[] SWAGGER_ENDPOINTS = {
             "/v2/api-docs",
@@ -59,15 +59,24 @@ public class SecurityConfig {
     };
 
     private final String[] USER_ENDPOINTS = {
-            "/api/v1/user/**"
+            "/api/v1/user/**",
+            "/api/v1/auth/reset-password",
+            "/api/v1/match/**",
+            "/api/v1/team/**",
+            "/api/v1/message/**",
+            "/api/v1/user-team/**",
+            "/api/v1/transactions",
+            "/api/v1/transactions/generate-qr",
+            "/api/v1/transactions/add-transaction",
+            "/api/v1/transactions/search-by-id",
+            "api/v1/notifications/**"
     };
     private final String[] ADMIN_ENDPOINTS = {
-            "/api/v1/admin/**"
+            "/api/v1/admin/**",
+            "/api/v1/transactions/search",
+            "/api/v1/room/**",
+            "/api/v1/transactions/update-transaction",
     };
-
-
-
-
 
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -86,16 +95,7 @@ public class SecurityConfig {
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers(WEBSOCKET_ENDPOINTS).permitAll()
                         .requestMatchers(SWAGGER_ENDPOINTS).permitAll()
-                        .requestMatchers("/api/v1/user/**").permitAll()
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/game/**").permitAll()
-                        .requestMatchers("/api/v1/room/**").permitAll()
-                        .requestMatchers("/api/v1/match/**").permitAll()
-                        .requestMatchers("/api/v1/team/**").permitAll()
-                        .requestMatchers("/api/v1/message/**").permitAll()
                         .requestMatchers("/api/v1/transactions/**").permitAll()
-                        .requestMatchers("/api/v1/transactions/search").permitAll()
-                        .requestMatchers("/api/v1/user-team/**").permitAll()
                         .requestMatchers(ADMIN_ENDPOINTS).hasAnyRole("ADMIN")
                         .anyRequest().authenticated());
 

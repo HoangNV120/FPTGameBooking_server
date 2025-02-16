@@ -40,20 +40,22 @@ public class JwtUtils {
         return null;
     }
 
-    public String generateJwtToken(UserDetails userDetails) {
+    public String generateJwtToken(UserDetails userDetails,String userId) {
         String username = userDetails.getUsername();
         return Jwts.builder()
                 .subject(username)
+                .claim("userId",userId)
                 .issuedAt(new Date())
                 .expiration(new Date((new Date()).getTime() + jwtExpirationMsToken))
                 .signWith(key())
                 .compact();
     }
 
-    public String generateJwtRefreshToken(UserDetails userDetails) {
+    public String generateJwtRefreshToken(UserDetails userDetails, String userId) {
         String username = userDetails.getUsername();
         return Jwts.builder()
                 .subject(username)
+                .claim("userId", userId)
                 .issuedAt(new Date())
                 .expiration(new Date((new Date()).getTime() + jwtExpirationMsRefreshToken))
                 .signWith(key())
@@ -65,6 +67,13 @@ public class JwtUtils {
                 .verifyWith((SecretKey) key())
                 .build().parseSignedClaims(token)
                 .getPayload().getSubject();
+    }
+
+    public String getUserIdFromJwtToken(String token) {
+        return Jwts.parser()
+                .verifyWith((SecretKey) key())
+                .build().parseSignedClaims(token)
+                .getPayload().get("userId").toString();
     }
 
     private Key key() {

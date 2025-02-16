@@ -72,5 +72,5 @@ public class Room extends AuditTable {
     private LocalDateTime endDate;
     private String description;
     @OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Team> teams = new ArrayList<>();
+    private List<Team>  teams = new ArrayList<>();
 }

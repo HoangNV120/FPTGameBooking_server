@@ -1,20 +1,21 @@
 package com.server.controller;
 
 import com.server.dto.request.user.CreateUserRequest;
+import com.server.dto.request.user.FindUserByIdRequest;
 import com.server.dto.request.user.FindUserRequest;
 import com.server.dto.request.user.UpdateUserRequest;
 import com.server.dto.response.common.PageableObject;
 import com.server.dto.response.common.ResponseGlobal;
+import com.server.dto.response.user.UserImageResponse;
 import com.server.dto.response.user.UserResponse;
 import com.server.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Slf4j
 @RestController
@@ -74,6 +75,21 @@ public class UserController {
         log.info("detail: {}", request);
 
         return new ResponseGlobal<>(userService.findByEmail(request.getEmail()));
+    }
+
+    @PostMapping("/update-user-image")
+    public ResponseGlobal<UserImageResponse> uploadImage(@RequestParam("userId") String id,
+                                                         @RequestParam("file") MultipartFile avatar) throws IOException {
+        log.info("Upload image request: {}", avatar.getOriginalFilename());
+
+        return new ResponseGlobal<>(userService.uploadImage(avatar, id));
+    }
+
+    @PostMapping("/find-by-id")
+    public ResponseGlobal<UserResponse> findById(@RequestBody FindUserByIdRequest request) {
+        log.info("Request find by id: {}", request);
+
+        return new ResponseGlobal<>(userService.getById(request.getUserId()));
     }
 
 }

@@ -14,11 +14,11 @@ import java.math.BigDecimal;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TransactionResponse {
+public class TransactionMinimalResponse {
     private String id;
     private BigDecimal amount;
     private int point;
-    private UserResponse userApprove;
+    private UserMinimalResponse userApprove;
     private TransactionEnum status;
     private String createdDate;
     private String updatedDate;

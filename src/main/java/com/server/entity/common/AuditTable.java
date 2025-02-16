@@ -36,11 +36,11 @@ public abstract class AuditTable implements Serializable {
     @CreatedDate
     @Column(name = "create_date", updatable = false)
     @JsonIgnore
-    private LocalDateTime createdDate = LocalDateTime.now();
+    private LocalDateTime createdDate = LocalDateTime.now().plusHours(7);
 
     @LastModifiedDate
     @Column(name = "update_date")
     @JsonIgnore
-    private LocalDateTime updatedDate = LocalDateTime.now();
+    private LocalDateTime updatedDate = LocalDateTime.now().plusHours(7);
 }
 

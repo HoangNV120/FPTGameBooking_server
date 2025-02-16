@@ -4,20 +4,20 @@ import com.server.dto.request.transaction.FindTransactionRequest;
 import com.server.dto.request.transaction.TransactionRequest;
 import com.server.dto.response.common.PageableObject;
 import com.server.dto.response.common.ResponseGlobal;
+import com.server.dto.response.transaction.TransactionMinimalResponse;
 import com.server.dto.response.transaction.TransactionResponse;
 import com.server.dto.response.userteam.UserTeamResponse;
+import com.server.entity.Notification;
 import com.server.entity.Transaction;
 import com.server.entity.User;
-import com.server.enums.LevelEnum;
-import com.server.enums.RoleEnum;
-import com.server.enums.StatusEnum;
-import com.server.enums.TransactionEnum;
+import com.server.enums.*;
 import com.server.exceptions.NotFoundExceptionHandler;
 import com.server.exceptions.RestApiException;
 import com.server.repository.TransactionRepository;
 import com.server.repository.UserRepository;
 import com.server.repository.specifications.TransactionSpecification;
 import com.server.service.EmailService;
+import com.server.service.NotificationService;
 import com.server.service.TransactionService;
 import com.server.service.UserService;
 import com.server.util.DateUtils;
@@ -52,6 +52,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final ModelMapper modelMapper;
     private final EmailService emailService;
     private final UserService userService;
+    private final NotificationService notificationService;
 
     @Override
     public TransactionResponse addTransaction(TransactionRequest request) {
@@ -75,6 +76,17 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setTransactionStatus(TransactionEnum.PENDING);
         transaction.setPoint(pointsToAdd);
 
+        // Tạo thông báo cho admin
+        Notification notification = Notification.builder()
+                .content(optionalUser.get().getName() + " đã yêu cầu mua " + pointsToAdd + " điểm với số tiền "
+                        + new DecimalFormat("#,### VNĐ").format(new BigDecimal(request.getAmount())))
+                .statusNotification(NotificationEnum.UNREAD)
+                .type("TRANSACTION")
+                .user(optionalAdmin.get())
+                .senderId(null)
+                .build();
+        notificationService.add(notification);
+
         // Lưu giao dịch
         Transaction savedTransaction = transactionRepository.save(transaction);
         TransactionResponse response = convertTransaction(savedTransaction);
@@ -84,6 +96,8 @@ public class TransactionServiceImpl implements TransactionService {
                 "/subscribe/payment-confirmation-admin/" + optionalAdmin.get().getId(),
                 new ResponseGlobal<>(response)
         );
+
+
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss z");
         String formattedDate = now.format(formatter);
@@ -126,6 +140,16 @@ public class TransactionServiceImpl implements TransactionService {
             user.setLevel(LevelEnum.PREMIER);
             userRepository.save(user);
 
+            Notification notification = Notification.builder()
+                    .content("Giao dịch mua " + pointsToAdd + " điểm với số tiền "
+                            + new DecimalFormat("#,### VNĐ").format(transaction.getAmount()) + " đã thành công.")
+                    .statusNotification(NotificationEnum.UNREAD)
+                    .type("TRANSACTION")
+                    .user(user)
+                    .senderId(null)
+                    .build();
+            notificationService.add(notification);
+
             // Gửi thông báo qua WebSocket khi giao dịch thành công
             simpMessagingTemplate.convertAndSend(
                     "/subscribe/payment-confirmation-success/" + transaction.getUserApprove().getId(),
@@ -146,6 +170,15 @@ public class TransactionServiceImpl implements TransactionService {
                     new ResponseGlobal<>(response)
             );
 
+            Notification notification = Notification.builder()
+                    .content("Giao dịch mua " + transaction.getPoint() + " điểm với số tiền "
+                            + new DecimalFormat("#,### VNĐ").format(transaction.getAmount()) + " bị hủy.")
+                    .statusNotification(NotificationEnum.UNREAD)
+                    .type("TRANSACTION")
+                    .user(transaction.getUserApprove())
+                    .senderId(null)
+                    .build();
+            notificationService.add(notification);
 
             // Gửi email thông báo cho người dùng
             emailService.sendEmailPurchasePointResult(formattedDate, transaction.getId(),
@@ -167,15 +200,25 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    public PageableObject<TransactionMinimalResponse> searchTransactionById(FindTransactionRequest request) {
+
+        Page<Transaction> transactionPage = findTransaction(request);
+
+        // Convert Transaction entities to TransactionResponse DTOs
+        List<TransactionMinimalResponse> transactionResponses = transactionPage.getContent().stream()
+                .map(this::convertTransactionMinimal)
+                .toList();
+
+        // Create and return the PageableObject
+        return new PageableObject<>(new PageImpl<>(transactionResponses,
+                PageRequest.of(request.getPageNo(), request.getPageSize()), transactionPage.getTotalElements()));
+    }
+
+    @Override
     public PageableObject<TransactionResponse> searchTransaction(FindTransactionRequest request) {
-        log.info("Searching transactions with request: {}", request);
 
-        // Build the Specification
-        Specification<Transaction> specification = TransactionSpecification.buildSpecification(request);
-
-        // Apply pagination and fetch the result
-        Page<Transaction> transactionPage = transactionRepository.findAll(specification,
-                PageRequest.of(request.getPageNo(), request.getPageSize()));
+        request.setUserId(null);
+        Page<Transaction> transactionPage = findTransaction(request);
 
         // Convert Transaction entities to TransactionResponse DTOs
         List<TransactionResponse> transactionResponses = transactionPage.getContent().stream()
@@ -187,9 +230,17 @@ public class TransactionServiceImpl implements TransactionService {
                 PageRequest.of(request.getPageNo(), request.getPageSize()), transactionPage.getTotalElements()));
     }
 
-
+    private Page<Transaction> findTransaction(FindTransactionRequest request) {
+        log.info("FindTransactionRequest = {}", request.toString());
+        Specification<Transaction> specification = TransactionSpecification.buildSpecification(request);
+        return transactionRepository.findAll(specification, PageRequest.of(request.getPageNo(), request.getPageSize()));
+    }
 
     private TransactionResponse convertTransaction(Transaction transaction){
         return modelMapper.map(transaction, TransactionResponse.class);
+    }
+
+    private TransactionMinimalResponse convertTransactionMinimal(Transaction transaction){
+        return modelMapper.map(transaction, TransactionMinimalResponse.class);
     }
 }

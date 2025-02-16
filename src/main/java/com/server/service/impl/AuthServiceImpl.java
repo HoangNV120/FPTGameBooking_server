@@ -86,8 +86,8 @@ public class AuthServiceImpl implements AuthService {
                 .orElse("");
 
         // Tạo JWT token và refresh token cho người dùng.
-        String jwtToken = jwtUtils.generateJwtToken(userDetails);
-        String jwtRefreshToken = jwtUtils.generateJwtRefreshToken(userDetails);
+        String jwtToken = jwtUtils.generateJwtToken(userDetails, optionalUser.get().getId());
+        String jwtRefreshToken = jwtUtils.generateJwtRefreshToken(userDetails, optionalUser.get().getId());
 
         log.info("login===> jwtToken = {}, jwtRefreshToken = {}", jwtToken, jwtRefreshToken);
 
@@ -128,8 +128,8 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
-        String jwtToken = jwtUtils.generateJwtToken(userDetails);
-        String jwtRefreshToken = jwtUtils.generateJwtRefreshToken(userDetails);
+        String jwtToken = jwtUtils.generateJwtToken(userDetails, user.getId());
+        String jwtRefreshToken = jwtUtils.generateJwtRefreshToken(userDetails, user.getId());
 
         log.info("signUp=====> jwtToken = {}, jwtRefreshToken = {}", jwtToken, jwtRefreshToken);
 

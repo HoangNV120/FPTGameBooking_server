@@ -137,11 +137,6 @@ public class RoomServiceImpl implements RoomService {
         }
 
         if (StringUtils.isNotEmpty(request.getNameUser())) {
-            sql.append(" AND r.nameUser LIKE :nameUser");
-            countSql.append(" AND r.nameUser LIKE :nameUser");
-        }
-
-        if (StringUtils.isNotEmpty(request.getNameUser())) {
             query.setParameter("nameUser", "%" + request.getNameUser() + "%");
             countQuery.setParameter("nameUser", "%" + request.getNameUser() + "%");
         }
@@ -168,6 +163,7 @@ public class RoomServiceImpl implements RoomService {
 
         // Tạo đối tượng Page và trả về
         Page<RoomResponse> page = new PageImpl<>(roomResponses, pageable, total);
+        log.info("FindRoomRequest===> response = {}", rooms.stream().toList());
         return new PageableObject<>(page);
     }
 
