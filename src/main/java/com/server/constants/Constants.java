@@ -7,6 +7,7 @@ public interface Constants {
     public static final String DEFAULT_EMAIL = "email";
     public static final String DEFAULT_URL_AVATAR = "https://cdn-icons-png.flaticon.com/512/5847/5847555.png";
 
+
     public static final int DEFAULT_SIZE = 5;
     public static final int DEFAULT_PAGE = 0;
 

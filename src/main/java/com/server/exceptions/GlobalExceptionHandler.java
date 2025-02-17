@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +39,7 @@ public class GlobalExceptionHandler {
     protected ResponseGlobal<String> handleNoHandlerFoundException(NoHandlerFoundException ex) {
         log.info(ex.getClass().getName());
         final String error = "No handler found for " + ex.getHttpMethod() + " " + ex.getRequestURL();
-        return new ResponseGlobal<>(HttpStatus.BAD_REQUEST.value(), error, LocalDateTime.now());
+        return new ResponseGlobal<>(HttpStatus.BAD_REQUEST.value(), error, ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
@@ -56,21 +58,21 @@ public class GlobalExceptionHandler {
             message = error.getDefaultMessage();
         }
 
-        return new ResponseGlobal<>(HttpStatus.BAD_REQUEST.value(), message, LocalDateTime.now());
+        return new ResponseGlobal<>(HttpStatus.BAD_REQUEST.value(), message, ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
     }
 
     @ExceptionHandler({NotFoundExceptionHandler.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     protected ResponseGlobal<String> handleNotFoundExceptionHandler(final NotFoundExceptionHandler ex) {
         log.info(ex.getClass().getName());
-        return new ResponseGlobal<>(HttpStatus.NOT_FOUND.value(), ex.getMessage(), LocalDateTime.now());
+        return new ResponseGlobal<>(HttpStatus.NOT_FOUND.value(), ex.getMessage(), ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
     }
 
     @ExceptionHandler({BadRequestApiException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ResponseGlobal<String> handleBadRequestExceptionHandler(final BadRequestApiException ex) {
         log.info(ex.getClass().getName());
-        return new ResponseGlobal<>(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), LocalDateTime.now());
+        return new ResponseGlobal<>(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
     }
 
     @ExceptionHandler({RestApiException.class})
@@ -78,7 +80,7 @@ public class GlobalExceptionHandler {
     protected ResponseGlobal<String> recordDuplicateExceptionHandler(final RestApiException ex) {
         log.info(ex.getClass().getName());
         return new ResponseGlobal<>(HttpStatus.CONFLICT.value(),
-                String.format(new DBMessageSourceConfig().getMessages("409"), ex.getMessage()), LocalDateTime.now());
+                String.format(new DBMessageSourceConfig().getMessages("409"), ex.getMessage()), ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
     }
 
     @ExceptionHandler({Exception.class})
@@ -86,13 +88,13 @@ public class GlobalExceptionHandler {
     protected ResponseGlobal<String> exception(final Exception ex) {
         log.info(ex.getMessage());
         return new ResponseGlobal<>(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                new DBMessageSourceConfig().getMessages("500"), LocalDateTime.now());
+                new DBMessageSourceConfig().getMessages("500"), ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
     }
 
     @ExceptionHandler(CustomAccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ResponseGlobal<String> handleCustomAccessDeniedException(CustomAccessDeniedException ex) {
-        return new ResponseGlobal<>(HttpStatus.FORBIDDEN.value(), ex.getMessage(), LocalDateTime.now());
+        return new ResponseGlobal<>(HttpStatus.FORBIDDEN.value(), ex.getMessage(), ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
     }
 
     // Websocket exception

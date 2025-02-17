@@ -46,6 +46,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -200,6 +201,9 @@ public class RoomServiceImpl implements RoomService {
         room.setStatus(StatusEnum.ACTIVE);
         room.setLevel(ObjectUtils.isNotEmpty(dto.getLevel()) ? dto.getLevel() : LevelRoomEnum.SCRIMS);
         room.setNameUser(user.getName());
+        room.setStartDate(dto.getStartDate());
+
+        log.info("Room created successfully = {}.", room.getStartDate());
 
         // Tạo đội mặc định
         Team teamDefaultOne = new Team();
@@ -297,7 +301,9 @@ public class RoomServiceImpl implements RoomService {
      * @return RoomResponse Thông tin phòng dạng phản hồi.
      */
     private RoomResponse convertRoomResponse(Room room) {
-        return modelMapper.map(room, RoomResponse.class);
+        RoomResponse response = modelMapper.map(room, RoomResponse.class);
+        response.setStartDate(room.getStartDate());
+        return response;
     }
 
 

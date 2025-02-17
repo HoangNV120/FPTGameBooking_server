@@ -8,6 +8,8 @@ import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Setter
 @Getter
@@ -17,20 +19,20 @@ public class ResponseGlobal<T> {
 
     private String message;
     private int status;
-    private LocalDateTime localDateTime;
+    private ZonedDateTime zonedDateTime;
     private T data;
 
     // Error
-    public ResponseGlobal(int status, String message, LocalDateTime localDateTime) {
+    public ResponseGlobal(int status, String message, ZonedDateTime zonedDateTime) {
         this.status = status;
         this.message = message;
-        this.localDateTime = localDateTime;
+        this.zonedDateTime = zonedDateTime;
     }
 
     public ResponseGlobal(T data) {
         this.status = HttpStatus.OK.value();
         this.message = Constants.DEFAULT_MESSAGE_SUCCESSFUL;
-        this.localDateTime = LocalDateTime.now().plusMinutes(7);
+        this.zonedDateTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
         this.data = data;
     }
 }

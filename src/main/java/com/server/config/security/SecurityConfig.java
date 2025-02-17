@@ -74,7 +74,7 @@ public class SecurityConfig {
     private final String[] ADMIN_ENDPOINTS = {
             "/api/v1/admin/**",
             "/api/v1/transactions/search",
-            "/api/v1/room/**",
+            "/api/v1/room/delete-room",
             "/api/v1/transactions/update-transaction",
     };
 

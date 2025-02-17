@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Slf4j
 @RestController
@@ -28,27 +30,30 @@ public class NotificationRestController {
     private final JwtUtils jwtUtils;
 
     @PostMapping("/view")
-    public ResponseGlobal<PageableObject<NotificationResponse>> view(@RequestBody FindNotificationRequest request, HttpServletRequest httpRequest) {
+    public ResponseGlobal<PageableObject<NotificationResponse>> view(@RequestBody FindNotificationRequest request,
+                                                                     HttpServletRequest httpRequest) {
         String jwt = jwtUtils.getJwtFromHeader(httpRequest);
         String userIdFromJwt = jwtUtils.getUserIdFromJwtToken(jwt);
 
         if (!userIdFromJwt.equals(request.getUserId())) {
             return new ResponseGlobal<>(HttpStatus.UNAUTHORIZED.value(),
                     "Không thể truy cập vào thông báo của tài khoản khác",
-                    LocalDateTime.now().plusHours(7));
+                    ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
         }
 
         return new ResponseGlobal<>(notificationService.findAll(request));
     }
 
     @PostMapping("/count-unread")
-    public ResponseGlobal<CountNotificationResponse> countUnread(@RequestBody CountUnreadNotificationRequest request, HttpServletRequest httpRequest) {
+    public ResponseGlobal<CountNotificationResponse> countUnread(@RequestBody CountUnreadNotificationRequest request,
+                                                                 HttpServletRequest httpRequest) {
         String jwt = jwtUtils.getJwtFromHeader(httpRequest);
         String userIdFromJwt = jwtUtils.getUserIdFromJwtToken(jwt);
 
         if (!userIdFromJwt.equals(request.getUserId())) {
             return new ResponseGlobal<>(HttpStatus.UNAUTHORIZED.value(),
-                    "Không thể truy cập vào thông báo của tài khoản khác", LocalDateTime.now().plusHours(7));
+                    "Không thể truy cập vào thông báo của tài khoản khác",
+                    ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
         }
 
         return new ResponseGlobal<>(notificationService.countNotificationUnreadByUserId(request.getUserId()));
