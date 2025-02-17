@@ -1,0 +1,22 @@
+name: Block Direct Push to Main (Except for Admin)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  prevent-direct-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kiểm tra người dùng push
+        run: |
+          ALLOWED_USER="HoangNV120"  # Thay thế bằng GitHub username của bạn
+          PUSHER="${{ github.actor }}"
+          
+          if [ "$PUSHER" != "$ALLOWED_USER" ]; then
+            echo "🚫 Người dùng $PUSHER không được phép push trực tiếp lên 'main'. Vui lòng tạo Pull Request!"
+            exit 1
+          fi
+          
+          echo "✅ Người dùng $PUSHER được phép push lên 'main'."
