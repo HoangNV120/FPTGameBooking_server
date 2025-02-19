@@ -2,13 +2,9 @@ package com.server.service.impl;
 
 import com.server.dto.request.userteam.CreateUserJoinTeamRequest;
 import com.server.dto.response.common.ResponseGlobal;
+import com.server.dto.response.userteam.UserRoomGameResponse;
 import com.server.dto.response.userteam.UserTeamResponse;
-import com.server.entity.Match;
-import com.server.entity.Message;
-import com.server.entity.Room;
-import com.server.entity.Team;
-import com.server.entity.User;
-import com.server.entity.UserTeam;
+import com.server.entity.*;
 import com.server.enums.RoleEnum;
 import com.server.enums.StatusEnum;
 import com.server.exceptions.MessageHandlingException;
@@ -64,6 +60,14 @@ public class UserTeamServiceImpl implements UserTeamService {
                 .map(this::convertUserTeamResponse)
                 .toList();
 
+    }
+
+    @Override
+    public List<UserTeamResponse> findByUserIdAndStatusActive(String userId) {
+        return userTeamRepository.findUserTeamByUser_IdAndStatus(userId, StatusEnum.ACTIVE)
+                .stream()
+                .map(this::convertUserTeamResponse)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -296,6 +300,19 @@ public class UserTeamServiceImpl implements UserTeamService {
         return convertUserTeamResponse(userTeam.get());
     }
 
+    @Override
+    public UserRoomGameResponse findRoomCodeAndGameCodeByUserId(String userId) {
+        Optional<UserTeam> userTeamOp = userTeamRepository.findByUser_Id(userId);
+        if (userTeamOp.isEmpty()) {
+            return new  UserRoomGameResponse(null, null);
+        }
+
+        UserTeam userTeam = userTeamOp.get();
+        Room room = userTeam.getTeam().getRoom();
+        Game game = room.getGame();
+        return new UserRoomGameResponse(room.getCode(), game.getCode());
+    }
+
 
     /**
      * Chuyển đổi đối tượng UserTeam thành UserTeamResponse để trả về trong API.
@@ -310,4 +327,5 @@ public class UserTeamServiceImpl implements UserTeamService {
     private int getMemberCount(String teamId) {
         return userTeamRepository.countUserTeamByTeam_id(teamId);
     }
+
 }

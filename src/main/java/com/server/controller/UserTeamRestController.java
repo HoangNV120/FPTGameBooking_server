@@ -1,14 +1,12 @@
 package com.server.controller;
 
 import com.server.dto.response.common.ResponseGlobal;
+import com.server.dto.response.userteam.UserRoomGameResponse;
 import com.server.dto.response.userteam.UserTeamResponse;
 import com.server.service.UserTeamService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -40,6 +38,18 @@ public class UserTeamRestController {
     public ResponseGlobal<UserTeamResponse> removeUserFromTeam(@RequestParam("userTeamId") String userTeamId) {
         log.info("removeUserFromTeam: userTeamId = {}", userTeamId);
         return new ResponseGlobal<>(userTeamService.removeUserFromTeam(userTeamId));
+    }
+
+    @PostMapping("/find-by-user-id")
+    public ResponseGlobal<List<UserTeamResponse>> findByUserId(@RequestParam("userId") String userId) {
+        log.info("findByUserId: userId = {}", userId);
+        return new ResponseGlobal<>(userTeamService.findByUserIdAndStatusActive(userId));
+    }
+
+    @GetMapping("/get-room-code-and-game-code-by-user-id")
+    public ResponseGlobal<UserRoomGameResponse> getRoomIdByUserId(@RequestParam("userId") String userId) {
+        log.info("getRoomIdByUserId: userId = {}", userId);
+        return new ResponseGlobal<>(userTeamService.findRoomCodeAndGameCodeByUserId(userId));
     }
 
 }

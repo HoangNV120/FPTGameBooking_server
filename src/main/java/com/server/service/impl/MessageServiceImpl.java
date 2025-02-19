@@ -93,10 +93,12 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<MessageResponse> getAllMessagesByMessageType(String messageType) {
-        return messageRepository.findMessageByMessageType(MessageTypeEnum.fromString(messageType))
+
+        return messageRepository.findAllByMessageTypeOrderByCreatedDateAsc(MessageTypeEnum.fromString(messageType))
                 .stream()
                 .map(this::convertMessageResponse)
                 .toList();
+
     }
 
     private MessageResponse convertMessageResponse(Message message) {

@@ -1,6 +1,7 @@
 package com.server.service;
 
 import com.server.dto.request.userteam.CreateUserJoinTeamRequest;
+import com.server.dto.response.userteam.UserRoomGameResponse;
 import com.server.dto.response.userteam.UserTeamResponse;
 
 import java.util.List;
@@ -8,6 +9,8 @@ import java.util.List;
 public interface UserTeamService {
 
     List<UserTeamResponse> findByRoom(String codeRoom, String status, String userId);
+
+    List<UserTeamResponse> findByUserIdAndStatusActive(String userId);
 
     UserTeamResponse kickMemberFromTeam(String teamId, String userId);
 
@@ -18,5 +21,7 @@ public interface UserTeamService {
     UserTeamResponse exitTeamRoom(String codeRoom, String userId);
 
     UserTeamResponse removeUserFromTeam(String userTeamId);
+
+    UserRoomGameResponse findRoomCodeAndGameCodeByUserId(String userId);
 
 }

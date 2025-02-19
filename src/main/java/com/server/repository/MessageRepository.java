@@ -20,7 +20,7 @@ public interface MessageRepository extends JpaRepository<Message,String> {
     @Query(value = "DELETE FROM Message U WHERE U.id = :id ")
     void deleteById(String id);
 
-    List<Message> findMessageByMessageType(MessageTypeEnum messageType);
+    List<Message> findAllByMessageTypeOrderByCreatedDateAsc(MessageTypeEnum messageType);
 
     @Modifying
     @Transactional

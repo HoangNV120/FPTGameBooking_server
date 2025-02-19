@@ -1,5 +1,6 @@
 package com.server.repository;
 
+import com.server.entity.User;
 import com.server.entity.UserTeam;
 import com.server.enums.RoleEnum;
 import com.server.enums.StatusEnum;
@@ -32,6 +33,7 @@ public interface UserTeamRepository extends JpaRepository<UserTeam, String> {
     List<UserTeam> findUserTeamByTeam_Room_Code(String codeRoom);
 
     List<UserTeam> findUserTeamByUser_Id(String userId);
+    List<UserTeam> findUserTeamByUser_IdAndStatus(String userId, StatusEnum status);
 
     boolean existsUserTeamByTeam_IdAndRole(String teamId, RoleEnum role);
 
@@ -51,4 +53,6 @@ public interface UserTeamRepository extends JpaRepository<UserTeam, String> {
     @Modifying
     @Transactional
     void deleteAllByTeam_Room_Code(String codeRoom);
+
+    Optional<UserTeam> findByUser_Id(String userId);
 }

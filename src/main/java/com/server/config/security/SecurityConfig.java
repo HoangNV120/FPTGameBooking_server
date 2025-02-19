@@ -41,7 +41,9 @@ public class SecurityConfig {
             "/api/v1/auth/verify-email",
             "/api/v1/auth/refresh-token",
             "/api/v1/auth/logout",
-            "/api/v1/game/**"};
+            "/api/v1/game/**",
+            "api/v1/system-stream-link/view",
+    };
 
     private final String[] SWAGGER_ENDPOINTS = {
             "/v2/api-docs",
@@ -76,6 +78,7 @@ public class SecurityConfig {
             "/api/v1/transactions/search",
             "/api/v1/room/delete-room",
             "/api/v1/transactions/update-transaction",
+            "/api/v1/system-stream-link/update",
     };
 
     @Bean
