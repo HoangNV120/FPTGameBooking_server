@@ -10,7 +10,7 @@ import com.server.dto.response.auth.ProfileResponse;
 public interface AuthService {
     LoginResponse login(LoginRequest loginRequest);
 
-    LoginResponse signUp(SignInRequest loginRequest);
+    String signUp(SignInRequest loginRequest);
 
     ProfileResponse getProfileUser(String email);
 

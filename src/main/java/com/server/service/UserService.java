@@ -17,5 +17,7 @@ public interface UserService extends BaseService<UserResponse, CreateUserRequest
 
     UserResponse findByEmail(String email);
 
+    UserResponse UpdateStatusAccount(String token);
+
     UserImageResponse uploadImage(MultipartFile file, String publicId) throws IOException;
 }

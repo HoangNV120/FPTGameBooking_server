@@ -46,6 +46,7 @@ public class User extends AuditTable implements UserDetails {
     private StatusEnum status;
     private String password;
     private String avatar;
+    private String activeToken;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

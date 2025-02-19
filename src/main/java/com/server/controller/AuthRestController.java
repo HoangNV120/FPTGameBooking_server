@@ -7,7 +7,9 @@ import com.server.dto.request.auth.SignInRequest;
 import com.server.dto.response.auth.LoginResponse;
 import com.server.dto.response.auth.ProfileResponse;
 import com.server.dto.response.common.ResponseGlobal;
+import com.server.dto.response.user.UserResponse;
 import com.server.service.AuthService;
+import com.server.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,7 @@ public class AuthRestController {
 
     private final AuthService authService;
     private final JwtUtils jwtUtils;
+    private final UserService userService;
 
     /**
      * Đăng nhập người dùng
@@ -50,9 +53,15 @@ public class AuthRestController {
      * @return ResponseGlobal<LoginResponse> chứa thông tin trả về sau khi đăng ký thành công
      */
     @PostMapping("/sign-up")
-    public ResponseGlobal<LoginResponse> signUp(@Valid @RequestBody SignInRequest request) {
+    public ResponseGlobal<String> signUp(@Valid @RequestBody SignInRequest request) {
         log.info("Signing up====> request = {}", request.toString());
         return new ResponseGlobal<>(authService.signUp(request));
+    }
+
+    @GetMapping("/activate")
+    public ResponseGlobal<UserResponse> activateAccount(@RequestParam String token) {
+        log.info("Active Account ====> Token = {}", token);
+        return new ResponseGlobal<>(userService.UpdateStatusAccount(token));
     }
 
     /**

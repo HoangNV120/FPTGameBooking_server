@@ -178,6 +178,23 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
+     * Active tài khoản khi bấm vào link.
+     *
+     * @param token của người dùng cần tìm.
+     * @return UserResponse thông tin người dùng.
+     */
+    @Override
+    public UserResponse UpdateStatusAccount(String token) {
+        User user = userRepository.findUsersByActiveToken(token)
+                .orElseThrow(() -> new RestApiException("Link kích hoạt không hợp lệ hoặc đã hết hạn."));
+
+        user.setStatus(StatusEnum.ACTIVE);
+        user.setActiveToken(null); // Xóa token sau khi kích hoạt
+        userRepository.save(user);
+        return convertUser(user);
+    }
+
+    /**
      * Tải lên một hình ảnh lên Cloudinary.
      *
      * @param file Hình ảnh cần tải lên.
@@ -213,5 +230,6 @@ public class UserServiceImpl implements UserService {
             System.out.println("Không thể xóa ảnh cũ: " + e.getMessage());
         }
     }
+
 }
 

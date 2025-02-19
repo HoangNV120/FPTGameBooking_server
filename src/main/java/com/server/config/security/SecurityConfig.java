@@ -41,6 +41,7 @@ public class SecurityConfig {
             "/api/v1/auth/verify-email",
             "/api/v1/auth/refresh-token",
             "/api/v1/auth/logout",
+            "/api/v1/auth/activate",
             "/api/v1/game/**",
             "api/v1/system-stream-link/view",
     };

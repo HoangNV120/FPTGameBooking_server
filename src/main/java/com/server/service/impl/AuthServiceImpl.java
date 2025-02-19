@@ -21,6 +21,7 @@ import com.server.util.RandomGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -46,6 +48,9 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserDetailsService userDetailsService;
     private final EmailService emailService;
+
+    @Value("${spring.app.base-url}") // Base URL từ cấu hình
+    private String baseUrl;
 
     /**
      * Xử lý đăng nhập của người dùng.
@@ -60,6 +65,11 @@ public class AuthServiceImpl implements AuthService {
         Optional<User> optionalUser = userRepository.findByEmail(loginRequest.getUsername());
         if (optionalUser.isEmpty()) {
             throw new NotFoundExceptionHandler("Tài khoản hoặc mật khẩu không đúng.");
+        }
+
+        Optional<User> userStatus = userRepository.findByStatus(StatusEnum.INACTIVE);
+        if(userStatus.isPresent()) {
+            throw new NotFoundExceptionHandler("Tài khoản chưa được kích hoạt vui lòng check mail xác nhận!");
         }
 
         Authentication authentication;
@@ -106,7 +116,7 @@ public class AuthServiceImpl implements AuthService {
      * @return LoginResponse chứa thông tin trả về sau khi đăng ký thành công, bao gồm token.
      */
     @Override
-    public LoginResponse signUp(SignInRequest req) {
+    public String signUp(SignInRequest req) {
         log.info("SignInRequest: {}", req);
 
         Optional<User> optional = userRepository.findByEmail(req.getEmail());
@@ -120,24 +130,21 @@ public class AuthServiceImpl implements AuthService {
         user.setPoint(0);
         user.setLevel(LevelEnum.fromString(req.getLevel()));
         user.setRole(RoleEnum.fromString(req.getRole()));
-        user.setStatus(StatusEnum.ACTIVE);
+        user.setStatus(StatusEnum.INACTIVE);
         user.setPassword(passwordEncoder.encode(req.getPassword()));
         user.setAvatar(StringUtils.isNotBlank(req.getAvatar())
                 ? req.getAvatar() : Constants.DEFAULT_URL_AVATAR);
 
+        //set token send to mail to active
+        String activationToken = UUID.randomUUID().toString();
+        user.setActiveToken(activationToken);
         userRepository.save(user);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
-        String jwtToken = jwtUtils.generateJwtToken(userDetails, user.getId());
-        String jwtRefreshToken = jwtUtils.generateJwtRefreshToken(userDetails, user.getId());
+        // Gửi email kích hoạt
+        String activationLink = baseUrl + "/activate/" + activationToken;
+        emailService.sendActivationEmail(req.getEmail(), activationLink);
 
-        log.info("signUp=====> jwtToken = {}, jwtRefreshToken = {}", jwtToken, jwtRefreshToken);
-
-        return LoginResponse.builder()
-                .username(userDetails.getUsername())
-                .accessToken(jwtToken)
-                .refreshToken(jwtRefreshToken)
-                .build();
+        return "Mở Mail click vào link để kích hoạt tài khoản";
     }
 
     /**
@@ -177,7 +184,7 @@ public class AuthServiceImpl implements AuthService {
         String password = new RandomGenerator().randomToString();
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
-        emailService.sendEmailForgotPassword(email, password);
+        emailService.sendEmail(email, password);
 
         return "Quên thành công";
     }

@@ -34,7 +34,8 @@ spring:
           auth: true
           starttls:
             enable: true
-
+  app:
+    base-url: https://fptgamebooking.vn
 
 # security
 jwtSecret: "mySecretKey123912738aopsgjnspkmndfsopkvajoirjg94gf2opfng2moknm"

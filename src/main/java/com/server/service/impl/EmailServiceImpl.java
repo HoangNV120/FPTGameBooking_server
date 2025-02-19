@@ -22,12 +22,21 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    public void sendEmailForgotPassword(String email, String password) {
+    public void sendEmail(String email, String password) {
         Map<String, Object> modeMap = new HashMap<>();
         modeMap.put("email", email);
         modeMap.put("password", password);
-        sendEmailServiceConfig.sendEmail(email, password, modeMap, "SendEmailPassword");
     }
+
+    @Async
+    @Override
+    public void sendActivationEmail(String email, String activationLink) {
+        Map<String, Object> modeMap = new HashMap<>();
+        modeMap.put("email", email);
+        modeMap.put("activationLink", activationLink);
+        sendEmailServiceConfig.sendEmail(email, activationLink, modeMap, "SignUp");
+    }
+
     @Async
     @Override
     public void sendEmailPurchasePointRequest(String time,String adminEmail, String transactionId, String userId,
@@ -43,6 +52,7 @@ public class EmailServiceImpl implements EmailService {
         sendEmailServiceConfig.sendEmail(adminEmail, "Purchase Point Request", modeMap, "PurchasePointRequest");
     }
 
+    @Async
     @Override
     public void sendEmailPurchasePointResult(String time, String transactionId, String email, String name, int point,
                                              String amount, String subject, String template) {

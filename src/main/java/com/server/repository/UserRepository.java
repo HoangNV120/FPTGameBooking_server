@@ -2,6 +2,7 @@ package com.server.repository;
 
 import com.server.entity.User;
 import com.server.enums.RoleEnum;
+import com.server.enums.StatusEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +22,8 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     // Find users by email (partial search)
     Page<User> findByEmailContaining(String email, Pageable pageable);
+
+    Optional<User> findByStatus(StatusEnum status);
+
+    Optional<User> findUsersByActiveToken(String token);
 }
