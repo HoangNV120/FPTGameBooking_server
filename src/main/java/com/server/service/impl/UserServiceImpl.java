@@ -16,6 +16,7 @@ import com.server.enums.StatusEnum;
 import com.server.exceptions.NotFoundExceptionHandler;
 import com.server.exceptions.RestApiException;
 import com.server.repository.UserRepository;
+import com.server.repository.specifications.UserSpecification;
 import com.server.service.UserService;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -59,26 +60,14 @@ public class UserServiceImpl implements UserService {
     public PageableObject<UserResponse> findAll(FindUserRequest request) {
         log.info("Find all user request: {}", request);
 
-        Page<User> userPage;
+        PageRequest pageRequest = PageRequest.of(request.getPageNo(), request.getPageSize());
+        Page<User> userPage = userRepository.findAll(UserSpecification.getSpecifications(request), pageRequest);
 
-        // Áp dụng bộ lọc dựa trên yêu cầu
-        if (request.getName() != null && !request.getName().isEmpty()) {
-            userPage = userRepository.findByNameContaining(request.getName(), PageRequest.of(request.getPageNo(), request.getPageSize()));
-        } else if (request.getEmail() != null && !request.getEmail().isEmpty()) {
-            userPage = userRepository.findByEmailContaining(request.getEmail(), PageRequest.of(request.getPageNo(), request.getPageSize()));
-        } else {
-            // Nếu không có bộ lọc, lấy tất cả người dùng với phân trang
-            userPage = userRepository.findAll(PageRequest.of(request.getPageNo(), request.getPageSize()));
-        }
-
-        // Dùng ModelMapper để chuyển đổi từ User entity sang UserResponse DTO
         List<UserResponse> userResponses = userPage.getContent().stream()
                 .map(user -> modelMapper.map(user, UserResponse.class))
                 .collect(Collectors.toList());
 
-        Page<UserResponse> page = new PageImpl<>(userResponses,
-                PageRequest.of(request.getPageNo(), request.getPageSize()),
-                userPage.getTotalElements());
+        Page<UserResponse> page = new PageImpl<>(userResponses, pageRequest, userPage.getTotalElements());
 
         return new PageableObject<>(page);
     }

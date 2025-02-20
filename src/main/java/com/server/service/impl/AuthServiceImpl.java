@@ -67,8 +67,7 @@ public class AuthServiceImpl implements AuthService {
             throw new NotFoundExceptionHandler("Tài khoản hoặc mật khẩu không đúng.");
         }
 
-        Optional<User> userStatus = userRepository.findByStatus(StatusEnum.INACTIVE);
-        if(userStatus.isPresent()) {
+        if(optionalUser.get().getStatus().equals(StatusEnum.INACTIVE)){
             throw new NotFoundExceptionHandler("Tài khoản chưa được kích hoạt vui lòng check mail xác nhận!");
         }
 
