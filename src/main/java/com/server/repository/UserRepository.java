@@ -27,4 +27,6 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
     Optional<User> findByStatus(StatusEnum status);
 
     Optional<User> findUsersByActiveToken(String token);
+
+    Optional<User> findFirstByEmailOrName(String email, String name);
 }
