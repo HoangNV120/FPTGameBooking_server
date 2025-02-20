@@ -118,10 +118,13 @@ public class AuthServiceImpl implements AuthService {
     public String signUp(SignInRequest req) {
         log.info("SignInRequest: {}", req);
 
-        Optional<User> optional = userRepository.findByEmail(req.getEmail());
-        if (optional.isPresent()) {
-            throw new RestApiException("Tài khoản đã tồn tại.");
-        }
+        userRepository.findFirstByEmailOrName(req.getEmail(), req.getName())
+            .ifPresent(user -> {
+                if (user.getEmail().equals(req.getEmail())) {
+                    throw new RestApiException("Gmail đã tồn tại.");
+                }
+                throw new RestApiException("Tên InGame đã tồn tại.");
+            });
 
         User user = new User();
         user.setEmail(req.getEmail());
