@@ -26,8 +26,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: fptgamebooking@gmail.com
-    password: cpjw kxqu atyp deek
+    username: levanlong2005@gmail.com
+    password: jaqa znob wjak xnab
     properties:
       mail:
         smtp:
