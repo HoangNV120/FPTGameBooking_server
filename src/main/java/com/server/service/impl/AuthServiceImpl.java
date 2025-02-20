@@ -180,7 +180,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RestApiException("Người dùng không tồn tại."));
 
-        String password = new RandomGenerator().randomToString();
+        String password = new RandomGenerator().randomPasswordToString();
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
         emailService.sendEmail(email, password);

@@ -5,7 +5,7 @@ spring:
   # database connection
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://157.66.27.80:3306/db_gamebooking?createDatabaseIfNotExist=true
+    url: jdbc:mysql://157.66.27.80:3306/db_gamebooking?createDatabaseIfNotExist=true&serverTimezone=Asia/Ho_Chi_Minh
     username: admin
     password: your_password
   jpa:
@@ -16,6 +16,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          time_zone: Asia/Ho_Chi_Minh
 
   servlet:
     multipart:
@@ -26,8 +28,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: fptgamebooking@gmail.com
-    password: cpjw kxqu atyp deek
+    username: fptgbsystem@gmail.com
+    password: xuaz lmnu swqs peau
     properties:
       mail:
         smtp:

@@ -1,6 +1,8 @@
 package com.server.entity.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.server.util.LocalDateTimeToAsiaHoChiMinhSerializer;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
@@ -30,17 +32,16 @@ public abstract class AuditTable implements Serializable {
     private String userCreate;
 
     @LastModifiedBy
-    @Column(name = " user_update")
+    @Column(name = "user_update")
     private String userUpdate;
 
     @CreatedDate
     @Column(name = "create_date", updatable = false)
-    @JsonIgnore
-    private LocalDateTime createdDate = LocalDateTime.now().plusHours(7);
+    @JsonSerialize(using = LocalDateTimeToAsiaHoChiMinhSerializer.class) // Serialize thành GMT+7
+    private LocalDateTime createdDate;
 
     @LastModifiedDate
     @Column(name = "update_date")
-    @JsonIgnore
-    private LocalDateTime updatedDate = LocalDateTime.now().plusHours(7);
+    @JsonSerialize(using = LocalDateTimeToAsiaHoChiMinhSerializer.class) // Serialize thành GMT+7
+    private LocalDateTime updatedDate;
 }
-

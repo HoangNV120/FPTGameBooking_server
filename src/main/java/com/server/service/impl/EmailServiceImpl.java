@@ -26,6 +26,7 @@ public class EmailServiceImpl implements EmailService {
         Map<String, Object> modeMap = new HashMap<>();
         modeMap.put("email", email);
         modeMap.put("password", password);
+        sendEmailServiceConfig.sendEmail(email, "Khôi Phục Mật Khẩu", modeMap, "SendEmailPassword");
     }
 
     @Async
@@ -34,7 +35,7 @@ public class EmailServiceImpl implements EmailService {
         Map<String, Object> modeMap = new HashMap<>();
         modeMap.put("email", email);
         modeMap.put("activationLink", activationLink);
-        sendEmailServiceConfig.sendEmail(email, activationLink, modeMap, "SignUp");
+        sendEmailServiceConfig.sendEmail(email, "Kích hoạt tài khoản", modeMap, "SignUp");
     }
 
     @Async

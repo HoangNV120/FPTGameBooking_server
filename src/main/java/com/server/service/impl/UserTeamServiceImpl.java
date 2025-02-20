@@ -238,13 +238,14 @@ public class UserTeamServiceImpl implements UserTeamService {
 
         // Lấy thông tin Team và kiểm tra vai trò của User
         Team team = userTeam.getTeam();
+        log.info("exitTeamRoom==> Team = {}", userTeam.getId());
         boolean isTeamLeader = userTeam.getRole() == RoleEnum.ROLE_TEAM_LEADER;
 
         // Xóa User khỏi Team
         userTeamRepository.deleteById(userTeam.getId());
 
         // Nếu là Room Owner, xóa toàn bộ room và các liên quan
-        if (room.getUserUpdate().equals(userId)) {
+        if (room.getUserCreate().equals(userId)) {
             log.info("exitTeamRoom==> Exit All team ");
             List<Message> messagesInRoom = messageRepository.findMessageByRoom_codeOrderByUpdatedDateAsc(codeRoom);
             messagesInRoom.forEach(message -> messageRepository.deleteById(message.getId()));
