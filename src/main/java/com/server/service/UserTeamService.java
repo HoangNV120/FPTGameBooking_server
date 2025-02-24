@@ -24,4 +24,6 @@ public interface UserTeamService {
 
     UserRoomGameResponse findRoomCodeAndGameCodeByUserId(String userId);
 
+    UserTeamResponse getByTeamRoomIdAndUserIdAndRole(String userId, String codeRoom);
+
 }

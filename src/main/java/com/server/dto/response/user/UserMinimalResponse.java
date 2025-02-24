@@ -13,6 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserMinimalResponse  {
+    private String id;
     private String name;
     private LevelEnum level;
     private StatusEnum status;

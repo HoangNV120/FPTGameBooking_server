@@ -52,4 +52,10 @@ public class UserTeamRestController {
         return new ResponseGlobal<>(userTeamService.findRoomCodeAndGameCodeByUserId(userId));
     }
 
+    @GetMapping("/get-by-user-id-and-room-code")
+    public ResponseGlobal<UserTeamResponse> getByUserIdAndRoomCode(@RequestParam("userId") String userId,
+                                                                   @RequestParam("codeRoom") String codeRoom) {
+        log.info("getByUserIdAndRoomCode: userId = {}, codeRoom = {}", userId, codeRoom);
+        return new ResponseGlobal<>(userTeamService.getByTeamRoomIdAndUserIdAndRole(userId, codeRoom));
+    }
 }

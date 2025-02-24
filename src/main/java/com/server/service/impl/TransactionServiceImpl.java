@@ -237,10 +237,14 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private TransactionResponse convertTransaction(Transaction transaction){
-        return modelMapper.map(transaction, TransactionResponse.class);
+        TransactionResponse response = modelMapper.map(transaction, TransactionResponse.class);
+        response.setStatus(TransactionEnum.fromValue(transaction.getTransactionStatus().getValue()));
+        return response;
     }
 
-    private TransactionMinimalResponse convertTransactionMinimal(Transaction transaction){
-        return modelMapper.map(transaction, TransactionMinimalResponse.class);
+    private TransactionMinimalResponse convertTransactionMinimal(Transaction transaction) {
+        TransactionMinimalResponse response = modelMapper.map(transaction, TransactionMinimalResponse.class);
+        response.setStatus(TransactionEnum.fromValue(transaction.getTransactionStatus().getValue()));
+        return response;
     }
 }

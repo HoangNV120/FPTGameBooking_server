@@ -314,6 +314,17 @@ public class UserTeamServiceImpl implements UserTeamService {
         return new UserRoomGameResponse(room.getCode(), game.getCode());
     }
 
+    @Override
+    public UserTeamResponse getByTeamRoomIdAndUserIdAndRole(String userId, String codeRoom) {
+        Room room = roomRepository.findRoomByCode(codeRoom)
+                .orElseThrow(() -> new NotFoundExceptionHandler("Không tìm thấy phòng"));
+        Optional<UserTeam> userTeam = userTeamRepository.findUserTeamByTeam_Room_IdAndUser_IdAndRole(room.getId(), userId, RoleEnum.ROLE_TEAM_LEADER);
+        if (userTeam.isEmpty()) {
+            throw new NotFoundExceptionHandler("Không tìm thấy người chơi");
+        }
+        return convertUserTeamResponse(userTeam.get());
+    }
+
 
     /**
      * Chuyển đổi đối tượng UserTeam thành UserTeamResponse để trả về trong API.

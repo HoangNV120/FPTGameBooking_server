@@ -1,5 +1,6 @@
 package com.server.entity.common;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.server.util.LocalDateTimeToAsiaHoChiMinhSerializer;
@@ -37,11 +38,11 @@ public abstract class AuditTable implements Serializable {
 
     @CreatedDate
     @Column(name = "create_date", updatable = false)
-    @JsonSerialize(using = LocalDateTimeToAsiaHoChiMinhSerializer.class) // Serialize thành GMT+7
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Ho_Chi_Minh")
     private LocalDateTime createdDate;
 
     @LastModifiedDate
     @Column(name = "update_date")
-    @JsonSerialize(using = LocalDateTimeToAsiaHoChiMinhSerializer.class) // Serialize thành GMT+7
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Ho_Chi_Minh")
     private LocalDateTime updatedDate;
 }
