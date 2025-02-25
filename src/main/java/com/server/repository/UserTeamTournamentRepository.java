@@ -1,8 +1,24 @@
 package com.server.repository;
 
+import com.server.dto.response.userteamtournament.UserTeamTournamentResponse;
+import com.server.entity.TeamTournament;
+import com.server.entity.User;
 import com.server.entity.UserTeamTournament;
+import com.server.enums.TeamTournamentRoleEnum;
+import java.util.List;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface UserTeamTournamentRepository extends JpaRepository<UserTeamTournament, String> {
     int countByTeamId(String id);
+    void deleteByUserAndTeam(User request, TeamTournament team);
+    void deleteUserTeamTournamentByTeam(TeamTournament team);
+
+    @Query("SELECT u.team FROM UserTeamTournament u WHERE u.user.id = :userId")
+    TeamTournament getTeamTournamentByUserId(@Param("userId") String id);
+    UserTeamTournament findByUser(User request);
+    List<UserTeamTournament> findByTeamAndTeamRoleNotOrderByCreatedDateAsc(TeamTournament teamTournament,
+        TeamTournamentRoleEnum roleEnum, Pageable pageable);
 }

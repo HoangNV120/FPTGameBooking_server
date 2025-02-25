@@ -17,7 +17,7 @@ public class UserTeamTournament extends AuditTable {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -28,4 +28,5 @@ public class UserTeamTournament extends AuditTable {
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum('LEADER','MEMBER') DEFAULT 'MEMBER'")
     private TeamTournamentRoleEnum teamRole;
+
 }
