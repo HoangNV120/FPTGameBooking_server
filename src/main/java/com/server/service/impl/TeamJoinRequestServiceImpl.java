@@ -6,13 +6,17 @@ import com.server.dto.response.teamtournament.TeamTournamentResponse;
 import com.server.entity.TeamJoinRequest;
 import com.server.entity.TeamTournament;
 import com.server.entity.User;
+import com.server.entity.UserTeamTournament;
 import com.server.enums.RequestStatusEnum;
+import com.server.enums.TeamTournamentRoleEnum;
 import com.server.exceptions.RestApiException;
 import com.server.repository.TeamJoinRequestRepository;
 import com.server.repository.TeamTournamentRepository;
 import com.server.repository.UserRepository;
+import com.server.repository.UserTeamTournamentRepository;
 import com.server.service.TeamJoinRequestService;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -27,6 +31,7 @@ public class TeamJoinRequestServiceImpl implements TeamJoinRequestService {
   private final UserRepository userRepository;
   private final TeamTournamentRepository teamTournamentRepository;
   private final ModelMapper modelMapper;
+  private final UserTeamTournamentRepository userTeamTournamentRepository;
 
   @Override
   public TeamJoinRespone sendTeamJoinRequest(TeamJoinRequestDTO requestDTO ) {
@@ -44,6 +49,26 @@ public class TeamJoinRequestServiceImpl implements TeamJoinRequestService {
         .build();
     teamJoinRequestRepository.save(teamJoinRequest);
     return convertToResponse(teamJoinRequest);
+  }
+
+  @Override
+  public List<TeamJoinRespone> viewTeamJoinRequest(String userId) {
+    User user = userRepository.findById(userId).orElseThrow(()-> new RestApiException("User Not Found"));
+    TeamTournament team = userTeamTournamentRepository.getTeamTournamentByUserId(user.getId()).orElseThrow(()-> new RestApiException("Team Not Found"));
+
+    TeamTournamentRoleEnum roleUser = userTeamTournamentRepository.findByUser(user)
+        .map(UserTeamTournament::getTeamRole)
+        .orElse(null);
+
+    if(roleUser.equals(TeamTournamentRoleEnum.LEADER)){
+      List<TeamJoinRequest> requestJoin = teamJoinRequestRepository.findByTeamId(team.getId());
+      return requestJoin.stream()
+          .map(this::convertToResponse)  // Gọi phương thức convert từng phần tử
+          .collect(Collectors.toList()); // Thu thập lại thành List;
+    }else {
+      new RestApiException("Member cannot view request join Clan!");
+    }
+    return null;
   }
 
   private TeamJoinRespone convertToResponse(TeamJoinRequest teamJoinRequest) {

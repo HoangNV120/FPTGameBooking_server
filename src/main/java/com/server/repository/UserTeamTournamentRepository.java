@@ -6,6 +6,7 @@ import com.server.entity.User;
 import com.server.entity.UserTeamTournament;
 import com.server.enums.TeamTournamentRoleEnum;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,8 +18,8 @@ public interface UserTeamTournamentRepository extends JpaRepository<UserTeamTour
     void deleteUserTeamTournamentByTeam(TeamTournament team);
 
     @Query("SELECT u.team FROM UserTeamTournament u WHERE u.user.id = :userId")
-    TeamTournament getTeamTournamentByUserId(@Param("userId") String id);
-    UserTeamTournament findByUser(User request);
+    Optional<TeamTournament> getTeamTournamentByUserId(@Param("userId") String id);
+    Optional<UserTeamTournament> findByUser(User request);
     List<UserTeamTournament> findByTeamAndTeamRoleNotOrderByCreatedDateAsc(TeamTournament teamTournament,
         TeamTournamentRoleEnum roleEnum, Pageable pageable);
 }

@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TeamJoinRequestRepository extends JpaRepository<TeamJoinRequest, String> {
-  List<TeamJoinRequest> findByTeamId(String teamId);
-  List<TeamJoinRequest> findByUserId(String userId);
+
   List<TeamJoinRequest> findByUserIdAndTeamId(String userId, String teamId);
+  List<TeamJoinRequest> findByTeamId(String teamId);
 }

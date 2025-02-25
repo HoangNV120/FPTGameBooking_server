@@ -1,6 +1,8 @@
 package com.server.dto.response.teamjoinrequest;
 
 import com.server.dto.response.teamtournament.TeamTournamentResponse;
+import com.server.dto.response.teamtournament.TeamTournamentResponseClan;
+import com.server.dto.response.user.UserReponseClan;
 import com.server.dto.response.user.UserResponse;
 import com.server.entity.TeamTournament;
 import com.server.entity.User;
@@ -29,11 +31,11 @@ public class TeamJoinRespone {
 
   @ManyToOne
   @JoinColumn(name = "user_id", nullable = false)
-  private UserResponse user;
+  private UserReponseClan user;
 
   @ManyToOne
   @JoinColumn(name = "team_id", nullable = false)
-  private TeamTournamentResponse team;
+  private TeamTournamentResponseClan team;
 
   @Enumerated(EnumType.STRING)
   @Column(columnDefinition = "enum('PENDING','APPROVED','REJECTED') DEFAULT 'PENDING'")

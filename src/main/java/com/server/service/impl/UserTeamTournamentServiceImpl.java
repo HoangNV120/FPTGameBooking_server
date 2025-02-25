@@ -34,9 +34,11 @@ public class UserTeamTournamentServiceImpl implements UserTeamTournamentService 
   public void leaveTeam(UserRequest request) {
     User user = UserRepository.findById(request.getId()).orElseThrow(()-> new RestApiException("User not found"));
 
-    TeamTournament team = userTeamTournamentRepository.getTeamTournamentByUserId(user.getId());
+    TeamTournament team = userTeamTournamentRepository.getTeamTournamentByUserId(user.getId()).orElseThrow(()->new RestApiException("Team not found"));
 
-    TeamTournamentRoleEnum roleUser = userTeamTournamentRepository.findByUser(user).getTeamRole();
+    TeamTournamentRoleEnum roleUser = userTeamTournamentRepository.findByUser(user)
+        .map(UserTeamTournament::getTeamRole)
+        .orElse(null);
 
     int memberCount = userTeamTournamentRepository.countByTeamId(team.getId());
 
