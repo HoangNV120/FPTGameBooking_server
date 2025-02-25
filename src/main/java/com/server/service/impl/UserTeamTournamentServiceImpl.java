@@ -6,6 +6,7 @@ import com.server.entity.TeamTournament;
 import com.server.entity.User;
 import com.server.entity.UserTeamTournament;
 import com.server.enums.TeamTournamentRoleEnum;
+import com.server.exceptions.RestApiException;
 import com.server.repository.TeamTournamentRepository;
 import com.server.repository.UserRepository;
 import com.server.repository.UserTeamTournamentRepository;
@@ -31,7 +32,7 @@ public class UserTeamTournamentServiceImpl implements UserTeamTournamentService 
   @Override
   @Transactional
   public void leaveTeam(UserRequest request) {
-    User user = UserRepository.findById(request.getId()).orElseThrow(()-> new RuntimeException("User not found"));
+    User user = UserRepository.findById(request.getId()).orElseThrow(()-> new RestApiException("User not found"));
 
     TeamTournament team = userTeamTournamentRepository.getTeamTournamentByUserId(user.getId());
 
