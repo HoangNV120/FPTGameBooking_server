@@ -1,6 +1,7 @@
 package com.server.controller;
 
 import com.server.dto.request.teamjoinrequest.TeamJoinRequestDTO;
+import com.server.dto.request.teamjoinrequest.UpdateStatusTeamJoinRequest;
 import com.server.dto.response.common.ResponseGlobal;
 import com.server.dto.response.teamjoinrequest.TeamJoinRespone;
 import com.server.entity.TeamJoinRequest;
@@ -31,7 +32,13 @@ public class TeamJoinRequestController {
 
   @GetMapping("/viewRequest")
   public ResponseGlobal<List<TeamJoinRespone>> viewRequest(@RequestParam("userId") String userId){
-    List<TeamJoinRespone> teamJoinRespone = teamJoinRequestService.viewTeamJoinRequest(userId);
-    return new ResponseGlobal<>(teamJoinRespone);
+    List<TeamJoinRespone> teamJoinResponse = teamJoinRequestService.viewTeamJoinRequest(userId);
+    return new ResponseGlobal<>(teamJoinResponse);
+  }
+
+  @PostMapping("/updateStatus")
+  public ResponseEntity<Void> updateStatus(@RequestParam("status")boolean status,@RequestParam("userId") String userId,@RequestParam("leaderId") String leaderId,@RequestParam("teamId") String teamId){
+    teamJoinRequestService.updateStatusTeamJoinRequest(status,userId,leaderId,teamId);
+    return ResponseEntity.ok().build();
   }
 }

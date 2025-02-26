@@ -1,6 +1,7 @@
 package com.server.service.impl;
 
 import com.server.dto.request.teamjoinrequest.TeamJoinRequestDTO;
+import com.server.dto.request.teamjoinrequest.UpdateStatusTeamJoinRequest;
 import com.server.dto.response.teamjoinrequest.TeamJoinRespone;
 import com.server.dto.response.teamtournament.TeamTournamentResponse;
 import com.server.entity.TeamJoinRequest;
@@ -15,7 +16,9 @@ import com.server.repository.TeamTournamentRepository;
 import com.server.repository.UserRepository;
 import com.server.repository.UserTeamTournamentRepository;
 import com.server.service.TeamJoinRequestService;
+import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +44,11 @@ public class TeamJoinRequestServiceImpl implements TeamJoinRequestService {
     if(!request.isEmpty()){
       throw new RestApiException("User has already requested to join this team!");
     }
+    Optional<TeamTournament> userExisted = userTeamTournamentRepository.getTeamTournamentByUserId(user.getId());
+    if(userExisted.isPresent()){
+      throw new RestApiException("User already has a Team!");
+    }
+
     TeamJoinRequest teamJoinRequest = TeamJoinRequest.builder()
         .user(user)
         .team(team)
@@ -61,7 +69,7 @@ public class TeamJoinRequestServiceImpl implements TeamJoinRequestService {
         .orElse(null);
 
     if(roleUser.equals(TeamTournamentRoleEnum.LEADER)){
-      List<TeamJoinRequest> requestJoin = teamJoinRequestRepository.findByTeamId(team.getId());
+      List<TeamJoinRequest> requestJoin = teamJoinRequestRepository.findByTeamIdAndStatus(team.getId(), RequestStatusEnum.PENDING);
       return requestJoin.stream()
           .map(this::convertToResponse)  // Gọi phương thức convert từng phần tử
           .collect(Collectors.toList()); // Thu thập lại thành List;
@@ -69,6 +77,39 @@ public class TeamJoinRequestServiceImpl implements TeamJoinRequestService {
       new RestApiException("Member cannot view request join Clan!");
     }
     return null;
+  }
+
+  @Override
+  @Transactional
+  public void updateStatusTeamJoinRequest(boolean status, String userId, String leader,String teamId) {
+    try{
+      User user = userRepository.findById(userId).orElseThrow(()-> new RestApiException("User Not Found"));
+      User leader1 = userRepository.findById(leader).orElseThrow(()-> new RestApiException("Leader Not Found"));
+
+      TeamTournamentRoleEnum roleUser = userTeamTournamentRepository.findByUser(leader1)
+          .map(UserTeamTournament::getTeamRole)
+          .orElse(null);
+
+      UserTeamTournament leaderTeamInfo = userTeamTournamentRepository
+          .findByUserAndTeamId(leader1, teamId)
+          .orElseThrow(() -> new RestApiException("Leader is not in this team"));
+
+      if (!TeamTournamentRoleEnum.LEADER.equals(leaderTeamInfo.getTeamRole())) {
+        throw new RestApiException("User is not the leader of this team");
+      }
+
+      if(TeamTournamentRoleEnum.LEADER.equals(roleUser)){
+        if(status){
+          teamJoinRequestRepository.approveTeamJoinRequest(RequestStatusEnum.ACCEPTED,userId, teamId);
+          teamJoinRequestRepository.rejectOtherTeamJoinRequests(RequestStatusEnum.REJECTED,userId, teamId);
+        }else{
+          teamJoinRequestRepository.rejectTeamJoinRequests(RequestStatusEnum.REJECTED,userId, teamId);
+        }
+      }
+    }catch (Exception e){
+      log.error(e.getMessage());
+    }
+
   }
 
   private TeamJoinRespone convertToResponse(TeamJoinRequest teamJoinRequest) {

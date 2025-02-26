@@ -22,4 +22,6 @@ public interface UserTeamTournamentRepository extends JpaRepository<UserTeamTour
     Optional<UserTeamTournament> findByUser(User request);
     List<UserTeamTournament> findByTeamAndTeamRoleNotOrderByCreatedDateAsc(TeamTournament teamTournament,
         TeamTournamentRoleEnum roleEnum, Pageable pageable);
+    Optional<UserTeamTournament> findByUserAndTeamId(User user, String teamId);
+
 }
