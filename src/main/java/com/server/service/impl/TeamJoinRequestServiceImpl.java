@@ -41,7 +41,8 @@ public class TeamJoinRequestServiceImpl implements TeamJoinRequestService {
     User user= userRepository.findById(requestDTO.getUserId()).orElseThrow(()-> new RestApiException("User Not Found"));
     TeamTournament team = teamTournamentRepository.findById(requestDTO.getTeamId()).orElseThrow(()-> new RestApiException("Team Not Found"));
     List<TeamJoinRequest> request = teamJoinRequestRepository.findByUserIdAndTeamId(requestDTO.getUserId(), requestDTO.getTeamId());
-    if(!request.isEmpty()){
+    boolean hasAccepted = request.stream().anyMatch(r -> r.getStatus() == RequestStatusEnum.ACCEPTED);
+    if(hasAccepted){
       throw new RestApiException("User has already requested to join this team!");
     }
     Optional<TeamTournament> userExisted = userTeamTournamentRepository.getTeamTournamentByUserId(user.getId());
