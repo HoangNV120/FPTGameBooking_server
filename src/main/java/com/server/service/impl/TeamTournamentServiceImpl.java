@@ -44,7 +44,7 @@ public class TeamTournamentServiceImpl implements TeamTournamentService {
 
     @Override
     public PageableObject<TeamTournamentResponse> findAll(FindTeamTournament request) {
-        Specification<TeamTournament> spec = Specification.where(null);
+        Specification<TeamTournament> spec = Specification.where(TeamTournamentSpecification.isNotDeleted());
 
         if (request.getName() != null) {
             spec = spec.and(TeamTournamentSpecification.hasNameLike(request.getName()));
@@ -60,11 +60,10 @@ public class TeamTournamentServiceImpl implements TeamTournamentService {
         return new PageableObject<>(page.map(teamTournament -> {
             TeamTournamentResponse response = convertToResponse(teamTournament);
             int recentMemberCount = userTeamTournamentRepository.countByTeamId(teamTournament.getId());
-            response.setRecentMemberCount( recentMemberCount);
+            response.setRecentMemberCount(recentMemberCount);
             return response;
         }));
     }
-
     @Override
     public TeamTournamentResponse add(CreateTeamTournament dto) {
         User user = userRepository.findById(dto.getUserId())
@@ -101,7 +100,12 @@ public class TeamTournamentServiceImpl implements TeamTournamentService {
     public TeamTournamentResponse getById(String id) {
         TeamTournament teamTournament = teamTournamentRepository.findById(id)
                 .orElseThrow(() -> new RestApiException("Team not found"));
-        return convertToResponse(teamTournament);
+
+        TeamTournamentResponse response = convertToResponse(teamTournament);
+        int recentMemberCount = userTeamTournamentRepository.countByTeamId(teamTournament.getId());
+        response.setRecentMemberCount(recentMemberCount);
+
+        return response;
     }
 
     @Override

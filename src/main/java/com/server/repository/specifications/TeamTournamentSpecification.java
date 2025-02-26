@@ -26,4 +26,9 @@ public class TeamTournamentSpecification {
             return criteriaBuilder.conjunction();
         };
     }
+
+    public static Specification<TeamTournament> isNotDeleted() {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("isDeleted"), false);
+    }
 }
