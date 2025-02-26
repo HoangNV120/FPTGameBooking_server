@@ -88,7 +88,7 @@ public class TeamJoinRequestServiceImpl implements TeamJoinRequestService {
       User user = userRepository.findById(userId).orElseThrow(()-> new RestApiException("User Not Found"));
       User leader1 = userRepository.findById(leader).orElseThrow(()-> new RestApiException("Leader Not Found"));
       TeamJoinRequest team = teamJoinRequestRepository.findTeamJoinRequestByUserIdAndTeamId(userId,teamId).orElseThrow(()-> new RestApiException("Join request not found"));
-
+      TeamTournament teamTournament = teamTournamentRepository.findById(teamId).orElseThrow(()-> new RestApiException("Team Tournament Not Found"));
       // dung leader moi co the accept or reject
       UserTeamTournament leaderTeamInfo = userTeamTournamentRepository
           .findByUserAndTeamId(leader1, teamId)
@@ -105,7 +105,11 @@ public class TeamJoinRequestServiceImpl implements TeamJoinRequestService {
       }
       if(status){
         teamJoinRequestRepository.deleteTeamJoinRequestsByUserId(userId);
-        userTeamTournamentRepository.addUserToTeamTournament(userId,teamId,TeamTournamentRoleEnum.MEMBER);
+        UserTeamTournament userTeamTournament = new UserTeamTournament();
+        userTeamTournament.setUser(user);
+        userTeamTournament.setTeamRole(TeamTournamentRoleEnum.MEMBER);
+        userTeamTournament.setTeam(teamTournament);
+        userTeamTournamentRepository.save(userTeamTournament);
       }else{
         teamJoinRequestRepository.deleteTeamJoinRequestByUserIdAndTeamId(userId,teamId);
       }

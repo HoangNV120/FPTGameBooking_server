@@ -38,5 +38,5 @@ public interface UserTeamTournamentRepository extends JpaRepository<UserTeamTour
     @Query("SELECT u.team FROM UserTeamTournament u WHERE u.user.id = :userId")
     Optional<TeamTournament> getTeamTournamentByUserIdWithLock(@Param("userId") String userId);
 
-    UserTeamTournamentResponse addUserToTeamTournament(String userId,String teamId, TeamTournamentRoleEnum role);
+
 }
