@@ -100,7 +100,8 @@ public class TeamTournamentServiceImpl implements TeamTournamentService {
     @Override
     public TeamTournamentResponse getById(String id) {
         TeamTournament teamTournament = teamTournamentRepository.findById(id)
-                .orElseThrow(() -> new RestApiException("Team not found"));
+                .filter(t -> !t.isDeleted())
+                .orElseThrow(() -> new RestApiException("Team not found or has been deleted"));
 
         TeamTournamentResponse response = convertToResponse(teamTournament);
         int recentMemberCount = userTeamTournamentRepository.countByTeamId(teamTournament.getId());
