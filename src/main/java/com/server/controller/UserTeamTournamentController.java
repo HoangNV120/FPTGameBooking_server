@@ -1,6 +1,8 @@
 package com.server.controller;
 
 import com.server.dto.request.user.UserRequest;
+import com.server.dto.response.common.ResponseGlobal;
+import com.server.dto.response.user.UserResponse;
 import com.server.service.UserTeamTournamentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +20,8 @@ public class UserTeamTournamentController {
   private final UserTeamTournamentService userTeamTournamentService;
 
   @PostMapping("/leaveClan")
-  public ResponseEntity<Void> leaveClan(@Valid @RequestBody UserRequest user){
-    userTeamTournamentService.leaveTeam(user);
-    return ResponseEntity.ok().build();
+  public ResponseGlobal<UserResponse> leaveClan(@Valid @RequestBody UserRequest user){
+    UserResponse userResponse = userTeamTournamentService.leaveTeam(user);
+    return new ResponseGlobal<>(userResponse);
   }
 }

@@ -81,10 +81,11 @@ public class TeamJoinRequestServiceImpl implements TeamJoinRequestService {
 
   @Override
   @Transactional
-  public void updateStatusTeamJoinRequest(boolean status, String userId, String leader,String teamId) {
+  public TeamJoinRespone updateStatusTeamJoinRequest(boolean status, String userId, String leader,String teamId) {
     try{
       User user = userRepository.findById(userId).orElseThrow(()-> new RestApiException("User Not Found"));
       User leader1 = userRepository.findById(leader).orElseThrow(()-> new RestApiException("Leader Not Found"));
+      TeamJoinRequest team = teamJoinRequestRepository.findTeamJoinRequestByUserIdAndTeamId(userId,teamId);
 
       TeamTournamentRoleEnum roleUser = userTeamTournamentRepository.findByUser(leader1)
           .map(UserTeamTournament::getTeamRole)
@@ -116,10 +117,10 @@ public class TeamJoinRequestServiceImpl implements TeamJoinRequestService {
           teamJoinRequestRepository.rejectTeamJoinRequests(RequestStatusEnum.REJECTED,userId, teamId);
         }
       }
+      return convertToResponse(team);
     }catch (Exception e){
-      log.error(e.getMessage());
+      throw new RestApiException("Failed to update team join request");
     }
-
   }
 
   private TeamJoinRespone convertToResponse(TeamJoinRequest teamJoinRequest) {

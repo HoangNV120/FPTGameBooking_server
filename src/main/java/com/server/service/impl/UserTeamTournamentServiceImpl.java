@@ -2,6 +2,7 @@ package com.server.service.impl;
 
 import com.server.dto.request.user.UserRequest;
 import com.server.dto.response.teamtournament.TeamTournamentResponse;
+import com.server.dto.response.user.UserResponse;
 import com.server.entity.TeamTournament;
 import com.server.entity.User;
 import com.server.entity.UserTeamTournament;
@@ -31,7 +32,7 @@ public class UserTeamTournamentServiceImpl implements UserTeamTournamentService 
 
   @Override
   @Transactional
-  public void leaveTeam(UserRequest request) {
+  public UserResponse leaveTeam(UserRequest request) {
     User user = UserRepository.findById(request.getId()).orElseThrow(()-> new RestApiException("User not found"));
 
     TeamTournament team = userTeamTournamentRepository.getTeamTournamentByUserId(user.getId()).orElseThrow(()->new RestApiException("Team not found"));
@@ -51,11 +52,11 @@ public class UserTeamTournamentServiceImpl implements UserTeamTournamentService 
       userTeamTournamentRepository.deleteUserTeamTournamentByTeam(team);
       team.setDeleted(true);
       teamTournamentRepository.save(team);
-      return;
+      return null;
     }
 
     UserTeamTournament newLeader = null;
-    if(roleUser.equals(TeamTournamentRoleEnum.LEADER)){
+    if(TeamTournamentRoleEnum.LEADER.equals((roleUser))){
       List<UserTeamTournament> users = userTeamTournamentRepository.findByTeamAndTeamRoleNotOrderByCreatedDateAsc(team,TeamTournamentRoleEnum.LEADER, PageRequest.of(0,1));
       if(!users.isEmpty()){
         newLeader = users.get(0);
@@ -67,9 +68,14 @@ public class UserTeamTournamentServiceImpl implements UserTeamTournamentService 
       newLeader.setTeamRole(TeamTournamentRoleEnum.LEADER);
       userTeamTournamentRepository.save(newLeader);
     }
+    return convertUser(request);
   }
 
   private TeamTournamentResponse convertToResponse(TeamTournament teamTournament) {
     return modelMapper.map(teamTournament, TeamTournamentResponse.class);
+  }
+
+  private UserResponse convertUser(UserRequest userRequest) {
+    return modelMapper.map(userRequest, UserResponse.class);
   }
 }

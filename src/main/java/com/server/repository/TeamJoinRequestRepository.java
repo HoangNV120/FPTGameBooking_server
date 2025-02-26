@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface TeamJoinRequestRepository extends JpaRepository<TeamJoinRequest, String> {
 
+  TeamJoinRequest findTeamJoinRequestByUserIdAndTeamId(String userId, String teamId);
   List<TeamJoinRequest> findByUserIdAndTeamId(String userId, String teamId);
   List<TeamJoinRequest> findByTeamIdAndStatus(String teamId, RequestStatusEnum status);
 

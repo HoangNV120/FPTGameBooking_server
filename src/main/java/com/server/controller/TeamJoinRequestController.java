@@ -37,8 +37,8 @@ public class TeamJoinRequestController {
   }
 
   @PostMapping("/updateStatus")
-  public ResponseEntity<Void> updateStatus(@RequestParam("status")boolean status,@RequestParam("userId") String userId,@RequestParam("leaderId") String leaderId,@RequestParam("teamId") String teamId){
-    teamJoinRequestService.updateStatusTeamJoinRequest(status,userId,leaderId,teamId);
-    return ResponseEntity.ok().build();
+  public ResponseGlobal<TeamJoinRespone> updateStatus(@RequestParam("status")boolean status,@RequestParam("userId") String userId,@RequestParam("leaderId") String leaderId,@RequestParam("teamId") String teamId){
+    TeamJoinRespone teamJoinRespone = teamJoinRequestService.updateStatusTeamJoinRequest(status,userId,leaderId,teamId);
+    return new ResponseGlobal<>(teamJoinRespone);
   }
 }

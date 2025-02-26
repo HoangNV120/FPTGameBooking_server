@@ -33,9 +33,9 @@ public class TeamJoinRespone {
   @JoinColumn(name = "user_id", nullable = false)
   private UserReponseClan user;
 
-  @ManyToOne
-  @JoinColumn(name = "team_id", nullable = false)
-  private TeamTournamentResponseClan team;
+//  @ManyToOne
+//  @JoinColumn(name = "team_id", nullable = false)
+//  private TeamTournamentResponseClan team;
 
   @Enumerated(EnumType.STRING)
   @Column(columnDefinition = "enum('PENDING','APPROVED','REJECTED') DEFAULT 'PENDING'")
