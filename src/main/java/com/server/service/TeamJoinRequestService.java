@@ -13,5 +13,5 @@ import org.springframework.data.repository.query.Param;
 public interface TeamJoinRequestService {
   TeamJoinRespone sendTeamJoinRequest(TeamJoinRequestDTO request);
   List<TeamJoinRespone> viewTeamJoinRequest(String userId);
-  TeamJoinRespone updateStatusTeamJoinRequest(boolean status, String userId, String leader,String teamId);
+  TeamJoinRespone ResponseTeamJoinRequest(boolean status, String userId, String leader,String teamId);
 }

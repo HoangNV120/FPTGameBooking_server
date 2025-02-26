@@ -20,6 +20,7 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.swing.text.html.Option;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -40,14 +41,15 @@ public class TeamJoinRequestServiceImpl implements TeamJoinRequestService {
   public TeamJoinRespone sendTeamJoinRequest(TeamJoinRequestDTO requestDTO ) {
     User user= userRepository.findById(requestDTO.getUserId()).orElseThrow(()-> new RestApiException("User Not Found"));
     TeamTournament team = teamTournamentRepository.findById(requestDTO.getTeamId()).orElseThrow(()-> new RestApiException("Team Not Found"));
-    List<TeamJoinRequest> request = teamJoinRequestRepository.findByUserIdAndTeamId(requestDTO.getUserId(), requestDTO.getTeamId());
-    boolean hasAccepted = request.stream().anyMatch(r -> r.getStatus() == RequestStatusEnum.ACCEPTED);
-    if(hasAccepted){
-      throw new RestApiException("User has already requested to join this team!");
-    }
+
     Optional<TeamTournament> userExisted = userTeamTournamentRepository.getTeamTournamentByUserId(user.getId());
     if(userExisted.isPresent()){
       throw new RestApiException("User already has a Team!");
+    }
+
+    Optional<TeamJoinRequest> teamJoinRequestCheck = teamJoinRequestRepository.findTeamJoinRequestByUserIdAndTeamId(requestDTO.getUserId(), requestDTO.getTeamId());
+    if(teamJoinRequestCheck.isPresent()){
+      throw new RestApiException("User send a request join a team");
     }
 
     TeamJoinRequest teamJoinRequest = TeamJoinRequest.builder()
@@ -69,29 +71,25 @@ public class TeamJoinRequestServiceImpl implements TeamJoinRequestService {
         .map(UserTeamTournament::getTeamRole)
         .orElse(null);
 
-    if(roleUser.equals(TeamTournamentRoleEnum.LEADER)){
-      List<TeamJoinRequest> requestJoin = teamJoinRequestRepository.findByTeamIdAndStatus(team.getId(), RequestStatusEnum.PENDING);
+    if(TeamTournamentRoleEnum.LEADER.equals(roleUser)){
+      List<TeamJoinRequest> requestJoin = teamJoinRequestRepository.findByTeamId(team.getId());
       return requestJoin.stream()
           .map(this::convertToResponse)  // Gọi phương thức convert từng phần tử
           .collect(Collectors.toList()); // Thu thập lại thành List;
     }else {
-      new RestApiException("Member cannot view request join Clan!");
+      throw new RestApiException("Member cannot view request join Clan!");
     }
-    return null;
   }
 
   @Override
   @Transactional
-  public TeamJoinRespone updateStatusTeamJoinRequest(boolean status, String userId, String leader,String teamId) {
+  public TeamJoinRespone ResponseTeamJoinRequest(boolean status, String userId, String leader,String teamId) {
     try{
       User user = userRepository.findById(userId).orElseThrow(()-> new RestApiException("User Not Found"));
       User leader1 = userRepository.findById(leader).orElseThrow(()-> new RestApiException("Leader Not Found"));
-      TeamJoinRequest team = teamJoinRequestRepository.findTeamJoinRequestByUserIdAndTeamId(userId,teamId);
+      TeamJoinRequest team = teamJoinRequestRepository.findTeamJoinRequestByUserIdAndTeamId(userId,teamId).orElseThrow(()-> new RestApiException("Join request not found"));
 
-      TeamTournamentRoleEnum roleUser = userTeamTournamentRepository.findByUser(leader1)
-          .map(UserTeamTournament::getTeamRole)
-          .orElse(null);
-
+      // dung leader moi co the accept or reject
       UserTeamTournament leaderTeamInfo = userTeamTournamentRepository
           .findByUserAndTeamId(leader1, teamId)
           .orElseThrow(() -> new RestApiException("Leader is not in this team"));
@@ -105,30 +103,19 @@ public class TeamJoinRequestServiceImpl implements TeamJoinRequestService {
       if (existingTeam.isPresent()) {
         throw new RestApiException("User is already in another team");
       }
-      //Kiem tra xem user da duoc duyet vao team nao hay chua
-      List<TeamJoinRequest> pending = teamJoinRequestRepository.findTeamJoinRequestsByUserIdAndStatus(userId,RequestStatusEnum.PENDING);
-      if(pending.isEmpty()){
-        throw new RestApiException("User is already in another team");
-      }
-      if(TeamTournamentRoleEnum.LEADER.equals(roleUser)){
-        if(status){
-          teamJoinRequestRepository.approveTeamJoinRequest(RequestStatusEnum.ACCEPTED,userId, teamId);
-          teamJoinRequestRepository.rejectOtherTeamJoinRequests(RequestStatusEnum.REJECTED,userId, teamId);
-        }else{
-          teamJoinRequestRepository.rejectTeamJoinRequests(RequestStatusEnum.REJECTED,userId, teamId);
-        }
+      if(status){
+        teamJoinRequestRepository.deleteTeamJoinRequestsByUserId(userId);
+        userTeamTournamentRepository.addUserToTeamTournament(userId,teamId,TeamTournamentRoleEnum.MEMBER);
+      }else{
+        teamJoinRequestRepository.deleteTeamJoinRequestByUserIdAndTeamId(userId,teamId);
       }
       return convertToResponse(team);
     }catch (Exception e){
-      throw new RestApiException("Failed to update team join request");
+      throw new RestApiException("Failed to response user join request");
     }
   }
 
   private TeamJoinRespone convertToResponse(TeamJoinRequest teamJoinRequest) {
     return modelMapper.map(teamJoinRequest, TeamJoinRespone.class);
-  }
-
-  private TeamJoinRequest convertToResponse(TeamJoinRespone teamJoinRespone) {
-    return modelMapper.map(teamJoinRespone, TeamJoinRequest.class);
   }
 }

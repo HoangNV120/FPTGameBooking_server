@@ -38,7 +38,7 @@ public class TeamJoinRequestController {
 
   @PostMapping("/updateStatus")
   public ResponseGlobal<TeamJoinRespone> updateStatus(@RequestParam("status")boolean status,@RequestParam("userId") String userId,@RequestParam("leaderId") String leaderId,@RequestParam("teamId") String teamId){
-    TeamJoinRespone teamJoinRespone = teamJoinRequestService.updateStatusTeamJoinRequest(status,userId,leaderId,teamId);
+    TeamJoinRespone teamJoinRespone = teamJoinRequestService.ResponseTeamJoinRequest(status,userId,leaderId,teamId);
     return new ResponseGlobal<>(teamJoinRespone);
   }
 }
