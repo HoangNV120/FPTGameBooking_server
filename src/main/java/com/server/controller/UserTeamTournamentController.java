@@ -1,6 +1,7 @@
 package com.server.controller;
 
 import com.server.dto.response.common.ResponseGlobal;
+import com.server.dto.response.user.UserMinimalResponse;
 import com.server.dto.response.userteamtournament.UserTeamTournamentResponse;
 import com.server.service.UserTeamTournamentService;
 import com.server.dto.request.user.UserRequest;
@@ -37,11 +38,10 @@ public class UserTeamTournamentController {
         UserTeamTournamentResponse response = userTeamTournamentService.findByUserId(userId);
         return new ResponseGlobal<>(response);
     }
-  private final UserTeamTournamentService userTeamTournamentService;
 
   @PostMapping("/leaveClan")
-  public ResponseGlobal<UserResponse> leaveClan(@Valid @RequestBody UserRequest user){
-    UserResponse userResponse = userTeamTournamentService.leaveTeam(user);
+  public ResponseGlobal<UserMinimalResponse> leaveClan(@Valid @RequestBody UserRequest user){
+    UserMinimalResponse userResponse = userTeamTournamentService.leaveTeam(user);
     return new ResponseGlobal<>(userResponse);
   }
 }

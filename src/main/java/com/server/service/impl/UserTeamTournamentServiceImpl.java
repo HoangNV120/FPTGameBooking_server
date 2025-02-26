@@ -2,6 +2,7 @@ package com.server.service.impl;
 
 import com.server.dto.request.user.UserRequest;
 import com.server.dto.response.teamtournament.TeamTournamentResponse;
+import com.server.dto.response.user.UserMinimalResponse;
 import com.server.dto.response.user.UserResponse;
 import com.server.entity.TeamTournament;
 import com.server.entity.User;
@@ -35,6 +36,8 @@ import java.util.Optional;
 public class UserTeamTournamentServiceImpl implements UserTeamTournamentService {
     private final UserTeamTournamentRepository userTeamTournamentRepository;
     private final ModelMapper modelMapper;
+    private final TeamTournamentRepository teamTournamentRepository;
+    private final UserRepository UserRepository;
 
     @Override
     public List<UserTeamTournamentResponse> findByTeamId(String id) {
@@ -60,14 +63,10 @@ public class UserTeamTournamentServiceImpl implements UserTeamTournamentService 
         return modelMapper.map(userTeamTournamentResponse, UserTeamTournament.class);
     }
 
-  private final ModelMapper modelMapper;
-  private final TeamTournamentRepository teamTournamentRepository;
-  private final UserTeamTournamentRepository userTeamTournamentRepository;
-  private final UserRepository UserRepository;
 
   @Override
   @Transactional
-  public UserResponse leaveTeam(UserRequest request) {
+  public UserMinimalResponse leaveTeam(UserRequest request) {
     User user = UserRepository.findById(request.getId()).orElseThrow(()-> new RestApiException("User not found"));
 
     TeamTournament team = userTeamTournamentRepository.getTeamTournamentByUserId(user.getId()).orElseThrow(()->new RestApiException("Team not found"));
@@ -110,7 +109,7 @@ public class UserTeamTournamentServiceImpl implements UserTeamTournamentService 
     return modelMapper.map(teamTournament, TeamTournamentResponse.class);
   }
 
-  private UserResponse convertUser(UserRequest userRequest) {
-    return modelMapper.map(userRequest, UserResponse.class);
+  private UserMinimalResponse convertUser(UserRequest userRequest) {
+    return modelMapper.map(userRequest, UserMinimalResponse.class);
   }
 }
