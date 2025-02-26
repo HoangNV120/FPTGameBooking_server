@@ -28,4 +28,5 @@ public class UserTeamTournament extends AuditTable {
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum('LEADER','MEMBER') DEFAULT 'MEMBER'")
     private TeamTournamentRoleEnum teamRole;
+
 }
