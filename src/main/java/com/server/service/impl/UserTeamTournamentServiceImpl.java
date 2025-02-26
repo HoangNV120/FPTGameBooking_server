@@ -44,7 +44,10 @@ public class UserTeamTournamentServiceImpl implements UserTeamTournamentService 
 
     if(memberCount <= 1)
     {
+      //xoa người dùng cu the ra khoi team
       userTeamTournamentRepository.deleteByUserAndTeam(user, team);
+
+      // xoa teamUser ra khoi bang team
       userTeamTournamentRepository.deleteUserTeamTournamentByTeam(team);
       team.setDeleted(true);
       teamTournamentRepository.save(team);
