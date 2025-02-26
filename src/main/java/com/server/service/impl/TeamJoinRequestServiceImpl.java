@@ -98,6 +98,16 @@ public class TeamJoinRequestServiceImpl implements TeamJoinRequestService {
         throw new RestApiException("User is not the leader of this team");
       }
 
+      // Kiểm tra lại xem user đã có đội chưa
+      Optional<TeamTournament> existingTeam = userTeamTournamentRepository.getTeamTournamentByUserIdWithLock(userId);
+      if (existingTeam.isPresent()) {
+        throw new RestApiException("User is already in another team");
+      }
+      //Kiem tra xem user da duoc duyet vao team nao hay chua
+      List<TeamJoinRequest> pending = teamJoinRequestRepository.findTeamJoinRequestsByUserIdAndStatus(userId,RequestStatusEnum.PENDING);
+      if(pending.isEmpty()){
+        throw new RestApiException("User is already in another team");
+      }
       if(TeamTournamentRoleEnum.LEADER.equals(roleUser)){
         if(status){
           teamJoinRequestRepository.approveTeamJoinRequest(RequestStatusEnum.ACCEPTED,userId, teamId);

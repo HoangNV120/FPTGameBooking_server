@@ -26,4 +26,7 @@ public interface TeamJoinRequestRepository extends JpaRepository<TeamJoinRequest
   @Query("UPDATE TeamJoinRequest t SET t.status = :status WHERE t.user.id = :userId AND t.team.id = :teamId")
   void rejectTeamJoinRequests(@Param("status") RequestStatusEnum status,@Param("userId") String userId, @Param("teamId") String teamId);
 
+  @Query("SELECT t from TeamJoinRequest t WHERE t.user.id = :userId AND t.status = :status")
+  List<TeamJoinRequest> findTeamJoinRequestsByUserIdAndStatus(@Param("userId")String userId,@Param("status") RequestStatusEnum statusEnum);
+
 }

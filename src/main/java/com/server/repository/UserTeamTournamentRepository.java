@@ -5,10 +5,12 @@ import com.server.entity.TeamTournament;
 import com.server.entity.User;
 import com.server.entity.UserTeamTournament;
 import com.server.enums.TeamTournamentRoleEnum;
+import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -24,4 +26,7 @@ public interface UserTeamTournamentRepository extends JpaRepository<UserTeamTour
         TeamTournamentRoleEnum roleEnum, Pageable pageable);
     Optional<UserTeamTournament> findByUserAndTeamId(User user, String teamId);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT u.team FROM UserTeamTournament u WHERE u.user.id = :userId")
+    Optional<TeamTournament> getTeamTournamentByUserIdWithLock(@Param("userId") String userId);
 }
