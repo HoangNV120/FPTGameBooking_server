@@ -1,5 +1,6 @@
 package com.server.repository;
 
+import com.server.dto.response.teamjoinrequest.TeamJoinRespone;
 import com.server.dto.response.userteamtournament.UserTeamTournamentResponse;
 import com.server.entity.TeamTournament;
 import com.server.entity.User;
@@ -34,4 +35,6 @@ public interface UserTeamTournamentRepository extends JpaRepository<UserTeamTour
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT u.team FROM UserTeamTournament u WHERE u.user.id = :userId")
     Optional<TeamTournament> getTeamTournamentByUserIdWithLock(@Param("userId") String userId);
+
+    UserTeamTournamentResponse addUserToTeamTournament(String userId,String teamId, TeamTournamentRoleEnum role);
 }
