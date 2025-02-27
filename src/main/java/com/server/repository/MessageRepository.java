@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Repository
-public interface MessageRepository extends JpaRepository<Message,String> {
+public interface MessageRepository extends JpaRepository<Message, String> {
 
     List<Message> findMessageByRoom_codeOrderByUpdatedDateAsc(String codeRoom);
 
@@ -24,5 +24,5 @@ public interface MessageRepository extends JpaRepository<Message,String> {
 
     @Modifying
     @Transactional
-    void deleteAllByRoom_Code (String codeRoom);
+    void deleteAllByRoom_Code(String codeRoom);
 }

@@ -11,8 +11,7 @@ public enum MatchStatusEnum {
     IN_PROGRESS(1, "Trận đấu đang diễn ra"),
     COMPLETED(2, "Trận đấu đã kết thúc"),
     CANCELLED(3, "Trận đấu bị hủy"),
-    CONFIRMED(5, "Trận đấu đã xác nhận")
-    ;
+    CONFIRMED(5, "Trận đấu đã xác nhận");
 
     private final Integer value;
     private final String description;

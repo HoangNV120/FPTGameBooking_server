@@ -21,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import java.util.Arrays;
 
 @Configuration
@@ -81,6 +82,7 @@ public class SecurityConfig {
             "/api/v1/transactions/update-transaction",
             "/api/v1/system-stream-link/update",
             "/api/v1/user/exportToExcel",
+            "/api/v1/transactions/exportToExcelTransactions",
     };
 
     @Bean
@@ -104,7 +106,7 @@ public class SecurityConfig {
                         .requestMatchers(ADMIN_ENDPOINTS).hasAnyRole("ADMIN")
                         .anyRequest().authenticated());
 
-        http .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.exceptionHandling(exception -> exception
                 .authenticationEntryPoint(authEntryPointJwt)
                 .accessDeniedHandler(authAccessDeniedJwt)

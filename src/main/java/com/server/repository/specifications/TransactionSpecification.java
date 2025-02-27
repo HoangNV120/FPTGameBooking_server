@@ -4,10 +4,9 @@ import com.server.dto.request.transaction.FindTransactionRequest;
 import com.server.entity.Transaction;
 import com.server.enums.TransactionEnum;
 import com.server.exceptions.NotFoundExceptionHandler;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
-import jakarta.persistence.criteria.Predicate;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -32,7 +32,7 @@ public class SendEmailServiceConfig {
 
     @Async
     public CompletableFuture<Boolean> sendEmail(String to, String subject,
-                                                        Map<String, Object> model, String templateName) {
+                                                Map<String, Object> model, String templateName) {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);

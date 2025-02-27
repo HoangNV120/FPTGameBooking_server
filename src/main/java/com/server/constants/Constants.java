@@ -11,6 +11,7 @@ public interface Constants {
 
     public static final int DEFAULT_SIZE = 5;
     public static final int DEFAULT_PAGE = 0;
+    public static final int DEFAULT_TOURNAMENT_COST = 100;
 
     public interface Regexp {
         public static final String REGEXP_PASSWORD = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[^A-Za-z\\d])[A-Za-z\\d\\W]{8,}$";

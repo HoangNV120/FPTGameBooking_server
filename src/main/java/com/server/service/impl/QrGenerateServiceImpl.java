@@ -25,7 +25,7 @@ public class QrGenerateServiceImpl implements QrGenerateService {
         String consumerId = QrConstants.VALUE + QrDataBuilder.getLengthAndValue(request.getConsumerId());
         String strTotalAccount = QrConstants.VALUE + QrDataBuilder.getLengthAndValue(acquirerId + consumerId);
         String consumerAccountInformation = "38" + QrDataBuilder.getLengthAndValue(QrConstants.GUID + strTotalAccount + QrConstants.SERVICE_CODE);
-        String transactionAmount ="54"+QrDataBuilder.getLengthAndValue(request.getAmount());
+        String transactionAmount = "54" + QrDataBuilder.getLengthAndValue(request.getAmount());
         String additionalDataField = "62340107NPS68690819thanh toan don hang";
 
         String qrDataWithoutCRC = QrDataBuilder.buildQrData(

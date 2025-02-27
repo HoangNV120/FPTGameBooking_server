@@ -5,21 +5,7 @@ import com.server.enums.LevelRoomEnum;
 import com.server.enums.PlayerModeEnum;
 import com.server.enums.RankEnum;
 import com.server.enums.StatusEnum;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -68,5 +54,5 @@ public class Room extends AuditTable {
     private LocalDateTime endDate;
     private String description;
     @OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Team>  teams = new ArrayList<>();
+    private List<Team> teams = new ArrayList<>();
 }

@@ -35,7 +35,7 @@ public class UserController {
      * Tìm kiếm người dùng dựa trên các tham số tìm kiếm.
      *
      * @param request chứa các tham số tìm kiếm người dùng.
-     * @return ResponseGlobal<PageableObject<UserResponse>> chứa danh sách người dùng theo yêu cầu tìm kiếm.
+     * @return ResponseGlobal<PageableObject < UserResponse>> chứa danh sách người dùng theo yêu cầu tìm kiếm.
      */
     @PostMapping("/search")
     public ResponseGlobal<PageableObject<UserResponse>> viewUsers(@RequestBody FindUserRequest request) {

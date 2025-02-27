@@ -5,11 +5,16 @@ import com.server.dto.request.teamtournament.FindTeamTournament;
 import com.server.dto.request.teamtournament.UpdateTeamTournament;
 import com.server.dto.response.common.PageableObject;
 import com.server.dto.response.common.ResponseGlobal;
+import com.server.dto.response.teamtournament.TeamTournamentImageResponse;
 import com.server.dto.response.teamtournament.TeamTournamentResponse;
 import com.server.service.TeamTournamentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 @RestController
 @RequestMapping("/api/v1/team-tournament")
@@ -38,6 +43,13 @@ public class TeamTournamentController {
     @GetMapping("/{id}")
     public ResponseGlobal<TeamTournamentResponse> getById(@PathVariable String id) {
         TeamTournamentResponse response = teamTournamentService.getById(id);
+        return new ResponseGlobal<>(response);
+    }
+
+    @PostMapping(value = "/upload-image", consumes = "multipart/form-data")
+    public ResponseGlobal<TeamTournamentImageResponse> uploadImage(@RequestParam("teamId") String teamId,
+                                                                   @RequestParam("file") InputStream inputStream) throws IOException {
+        TeamTournamentImageResponse response = teamTournamentService.uploadImage(inputStream, teamId);
         return new ResponseGlobal<>(response);
     }
 }

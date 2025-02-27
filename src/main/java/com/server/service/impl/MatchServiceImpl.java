@@ -5,22 +5,11 @@ import com.server.dto.response.common.ResponseGlobal;
 import com.server.dto.response.match.MatchResponse;
 import com.server.dto.response.match.ResultMatchResponse;
 import com.server.dto.response.user.UserResponse;
-import com.server.entity.Match;
-import com.server.entity.Room;
-import com.server.entity.Team;
-import com.server.entity.Transaction;
-import com.server.entity.User;
-import com.server.entity.UserTeam;
+import com.server.entity.*;
 import com.server.enums.MatchStatusEnum;
 import com.server.enums.RoleEnum;
 import com.server.exceptions.NotFoundExceptionHandler;
-import com.server.exceptions.RestApiException;
-import com.server.repository.MatchRepository;
-import com.server.repository.RoomRepository;
-import com.server.repository.TeamRepository;
-import com.server.repository.TournamentRepository;
-import com.server.repository.UserRepository;
-import com.server.repository.UserTeamRepository;
+import com.server.repository.*;
 import com.server.service.MatchService;
 import com.server.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -111,7 +100,7 @@ public class MatchServiceImpl implements MatchService {
         simpMessagingTemplate.convertAndSend(
                 "/subscribe/confirm-match-active/"
                         + room.getCode() + "/" + (teamWinLeader.getUser().getId().equals(request.getUserId())
-                ? teamLoseLeader.getUser().getId() : teamWinLeader.getUser().getId()),
+                        ? teamLoseLeader.getUser().getId() : teamWinLeader.getUser().getId()),
                 new ResponseGlobal<>(response)
         );
 
@@ -167,7 +156,7 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public List<ResultMatchResponse> resultMatch(String teamOneId, String teamTwoId) {
         List<String> teamIds = Arrays.asList(teamOneId, teamTwoId);
-       return matchRepository.countMatchByTeamIdAndMatchStatus(teamIds, MatchStatusEnum.CONFIRMED.name());
+        return matchRepository.countMatchByTeamIdAndMatchStatus(teamIds, MatchStatusEnum.CONFIRMED.name());
     }
 
 

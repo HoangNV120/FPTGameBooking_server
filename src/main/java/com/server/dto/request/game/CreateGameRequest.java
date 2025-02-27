@@ -7,5 +7,5 @@ import lombok.ToString;
 @Setter
 @Getter
 @ToString
-public class CreateGameRequest extends BaseGame{
+public class CreateGameRequest extends BaseGame {
 }

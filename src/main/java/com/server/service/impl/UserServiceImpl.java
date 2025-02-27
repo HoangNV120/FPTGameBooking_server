@@ -191,7 +191,7 @@ public class UserServiceImpl implements UserService {
     /**
      * Tải lên một hình ảnh lên Cloudinary.
      *
-     * @param file Hình ảnh cần tải lên.
+     * @param file     Hình ảnh cần tải lên.
      * @param publicId ID công khai của hình ảnh.
      * @return URL của hình ảnh đã tải lên.
      * @throws IOException Nếu có lỗi trong quá trình tải lên.
@@ -214,12 +214,14 @@ public class UserServiceImpl implements UserService {
         user.setAvatar(uploadResult.get("secure_url").toString());
         userRepository.save(user);
 
-        return new UserImageResponse(  uploadResult.get("secure_url").toString());
+        return new UserImageResponse(uploadResult.get("secure_url").toString());
     }
 
     @Override
     public byte[] exportToExcel(List<UserResponse> userResponses) {
-        try (HSSFWorkbook workbook = new HSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+        try (
+            HSSFWorkbook workbook = new HSSFWorkbook();
+            ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             HSSFSheet sheet = workbook.createSheet("Users");
             HSSFRow headerRow = sheet.createRow(0);
 

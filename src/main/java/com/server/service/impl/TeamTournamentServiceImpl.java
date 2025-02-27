@@ -6,7 +6,6 @@ import com.server.constants.Constants;
 import com.server.dto.request.teamtournament.CreateTeamTournament;
 import com.server.dto.request.teamtournament.FindTeamTournament;
 import com.server.dto.request.teamtournament.UpdateTeamTournament;
-import com.server.dto.request.user.UserRequest;
 import com.server.dto.response.common.PageableObject;
 import com.server.dto.response.teamtournament.TeamTournamentImageResponse;
 import com.server.dto.response.teamtournament.TeamTournamentResponse;
@@ -30,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 @Slf4j
@@ -45,7 +45,7 @@ public class TeamTournamentServiceImpl implements TeamTournamentService {
 
     @Override
     public PageableObject<TeamTournamentResponse> findAll(FindTeamTournament request) {
-        Specification<TeamTournament> spec = Specification.where(null);
+        Specification<TeamTournament> spec = Specification.where(TeamTournamentSpecification.isNotDeleted());
 
         if (request.getName() != null) {
             spec = spec.and(TeamTournamentSpecification.hasNameLike(request.getName()));
@@ -61,7 +61,7 @@ public class TeamTournamentServiceImpl implements TeamTournamentService {
         return new PageableObject<>(page.map(teamTournament -> {
             TeamTournamentResponse response = convertToResponse(teamTournament);
             int recentMemberCount = userTeamTournamentRepository.countByTeamId(teamTournament.getId());
-            response.setRecentMemberCount( recentMemberCount);
+            response.setRecentMemberCount(recentMemberCount);
             return response;
         }));
     }
@@ -70,6 +70,11 @@ public class TeamTournamentServiceImpl implements TeamTournamentService {
     public TeamTournamentResponse add(CreateTeamTournament dto) {
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        //check if user already has a team
+        if (userTeamTournamentRepository.existsByUserId(user.getId())) {
+            throw new RestApiException("User already has a team");
+        }
 
         TeamTournament teamTournament = convertToEntity(dto);
         teamTournament.setImageLink(Constants.DEFAULT_URL_LOGO_TEAM);
@@ -101,17 +106,23 @@ public class TeamTournamentServiceImpl implements TeamTournamentService {
     @Override
     public TeamTournamentResponse getById(String id) {
         TeamTournament teamTournament = teamTournamentRepository.findById(id)
-                .orElseThrow(() -> new RestApiException("Team not found"));
-        return convertToResponse(teamTournament);
+                .filter(t -> !t.isDeleted())
+                .orElseThrow(() -> new RestApiException("Team not found or has been deleted"));
+
+        TeamTournamentResponse response = convertToResponse(teamTournament);
+        int recentMemberCount = userTeamTournamentRepository.countByTeamId(teamTournament.getId());
+        response.setRecentMemberCount(recentMemberCount);
+
+        return response;
     }
 
     @Override
-    public TeamTournamentImageResponse uploadImage(MultipartFile file, String teamId) throws IOException {
+    public TeamTournamentImageResponse uploadImage(InputStream file, String teamId) throws IOException {
         // Delete old image if exists
         deleteImage("team" + teamId);
 
         // Upload new image
-        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("public_id", "team" + teamId));
+        Map uploadResult = cloudinary.uploader().upload(file, ObjectUtils.asMap("public_id", "team" + teamId, "resource_type", "auto"));
 
         // Get team tournament by ID
         TeamTournament teamTournament = teamTournamentRepository.findById(teamId)

@@ -18,6 +18,7 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
     Optional<User> findByEmail(String email);
 
     Optional<User> findByRole(RoleEnum role);
+
     // Find users by name (partial search)
     Page<User> findByNameContaining(String name, Pageable pageable);
 

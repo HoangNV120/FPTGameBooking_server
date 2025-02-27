@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +39,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    public void sendEmailPurchasePointRequest(String time,String adminEmail, String transactionId, String userId,
+    public void sendEmailPurchasePointRequest(String time, String adminEmail, String transactionId, String userId,
                                               String userEmail, String name, int point, String amount) {
         Map<String, Object> modeMap = new HashMap<>();
         modeMap.put("time", time);

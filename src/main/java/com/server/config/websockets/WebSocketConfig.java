@@ -1,11 +1,9 @@
 package com.server.config.websockets;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -22,6 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     /**
      * Cung cấp `ServerEndpointExporter` để cấu hình các endpoint WebSocket.
+     *
      * @return ServerEndpointExporter instance.
      */
     @Bean
@@ -31,6 +30,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     /**
      * Cấu hình Message Broker.
+     *
      * @param registry đối tượng cấu hình Message Broker.
      */
     @Override
@@ -46,6 +46,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     /**
      * Cấu hình các STOMP endpoint mà client sử dụng để kết nối WebSocket.
+     *
      * @param registry đối tượng cấu hình StompEndpointRegistry.
      */
     @Override

@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class UpdateGameRequest extends BaseGame{
+public class UpdateGameRequest extends BaseGame {
     private DisplayEnum display;
     private StatusEnum status;
 }

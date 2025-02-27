@@ -9,12 +9,7 @@ import com.server.enums.RoleEnum;
 import com.server.enums.StatusEnum;
 import com.server.exceptions.MessageHandlingException;
 import com.server.exceptions.NotFoundExceptionHandler;
-import com.server.repository.MatchRepository;
-import com.server.repository.MessageRepository;
-import com.server.repository.RoomRepository;
-import com.server.repository.TeamRepository;
-import com.server.repository.UserRepository;
-import com.server.repository.UserTeamRepository;
+import com.server.repository.*;
 import com.server.service.UserTeamService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -305,7 +300,7 @@ public class UserTeamServiceImpl implements UserTeamService {
     public UserRoomGameResponse findRoomCodeAndGameCodeByUserId(String userId) {
         Optional<UserTeam> userTeamOp = userTeamRepository.findByUser_Id(userId);
         if (userTeamOp.isEmpty()) {
-            return new  UserRoomGameResponse(null, null);
+            return new UserRoomGameResponse(null, null);
         }
 
         UserTeam userTeam = userTeamOp.get();

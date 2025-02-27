@@ -1,6 +1,5 @@
 package com.server.dto.response.transaction;
 
-import com.server.dto.response.user.UserMinimalResponse;
 import com.server.dto.response.user.UserResponse;
 import com.server.enums.TransactionEnum;
 import lombok.AllArgsConstructor;

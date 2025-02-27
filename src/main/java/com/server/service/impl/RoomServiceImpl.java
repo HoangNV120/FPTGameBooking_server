@@ -5,14 +5,7 @@ import com.server.dto.request.room.FindRoomRequest;
 import com.server.dto.request.room.UpdateRoomRequest;
 import com.server.dto.response.common.PageableObject;
 import com.server.dto.response.room.RoomResponse;
-import com.server.dto.response.user.UserResponse;
-import com.server.dto.response.userteam.UserTeamResponse;
-import com.server.entity.Game;
-import com.server.entity.Match;
-import com.server.entity.Room;
-import com.server.entity.Team;
-import com.server.entity.User;
-import com.server.entity.UserTeam;
+import com.server.entity.*;
 import com.server.enums.LevelRoomEnum;
 import com.server.enums.RoleEnum;
 import com.server.enums.StatusEnum;
@@ -20,13 +13,7 @@ import com.server.exceptions.BadRequestApiException;
 import com.server.exceptions.MessageHandlingException;
 import com.server.exceptions.NotFoundExceptionHandler;
 import com.server.exceptions.RestApiException;
-import com.server.repository.GameRepository;
-import com.server.repository.MatchRepository;
-import com.server.repository.MessageRepository;
-import com.server.repository.RoomRepository;
-import com.server.repository.TeamRepository;
-import com.server.repository.UserRepository;
-import com.server.repository.UserTeamRepository;
+import com.server.repository.*;
 import com.server.service.MessageService;
 import com.server.service.RoomService;
 import com.server.util.RandomGenerator;
@@ -42,11 +29,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -239,7 +224,6 @@ public class RoomServiceImpl implements RoomService {
     }
 
 
-
     /**
      * Cập nhật thông tin phòng.
      *
@@ -324,7 +308,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public RoomResponse removeRoom(String codeGame,String codeRoom, String name) {
+    public RoomResponse removeRoom(String codeGame, String codeRoom, String name) {
         log.info("removeTeamRoom ==> codeRoom = {}, userId = {}", codeRoom, name);
 
         // Kiểm tra Room

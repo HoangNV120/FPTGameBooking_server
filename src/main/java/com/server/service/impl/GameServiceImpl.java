@@ -9,7 +9,6 @@ import com.server.entity.Game;
 import com.server.enums.DisplayEnum;
 import com.server.enums.StatusEnum;
 import com.server.exceptions.BadRequestApiException;
-import com.server.exceptions.NotFoundExceptionHandler;
 import com.server.exceptions.RestApiException;
 import com.server.repository.GameRepository;
 import com.server.service.GameService;

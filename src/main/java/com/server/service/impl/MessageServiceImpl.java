@@ -45,7 +45,7 @@ public class MessageServiceImpl implements MessageService {
             log.info("Add message to group");
         }
         Room room = null;
-        if(StringUtils.isNotBlank(message.getCodeRoom())){
+        if (StringUtils.isNotBlank(message.getCodeRoom())) {
             room = roomRepository.findRoomByCode(message.getCodeRoom())
                     .orElseThrow(() -> new NotFoundExceptionHandler("Không tìm thấy phòng"));
         }
@@ -84,7 +84,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public MessageResponse pinMessageToRoom(WebsocketMessage requestMessage) {
         Message message = messageRepository.findById(requestMessage.getIdMessage())
-                .orElseThrow( () ->  new NotFoundExceptionHandler("Không tìm thấy tin nhắn"));
+                .orElseThrow(() -> new NotFoundExceptionHandler("Không tìm thấy tin nhắn"));
 
         message.setMessageStatus(MessageStatusEnum.PINNED);
         messageRepository.save(message);

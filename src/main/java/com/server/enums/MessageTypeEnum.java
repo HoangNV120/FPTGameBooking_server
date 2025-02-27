@@ -10,8 +10,7 @@ public enum MessageTypeEnum {
     SYSTEM(0, "Tin nhắn hệ thống."),
     PRIVATE(1, "Tin nhắn giữa các cá nhân."),
     GROUP(2, "Tin nhắn trong nhóm."),
-    ALL(3, "Tin nhắn trong server.")
-    ;
+    ALL(3, "Tin nhắn trong server.");
 
     private final Integer value;
     private final String description;
@@ -23,7 +22,7 @@ public enum MessageTypeEnum {
      * @return MessageTypeEnum tương ứng với tên enum.
      * @throws IllegalArgumentException nếu không tìm thấy enum tương ứng.
      */
-    public static MessageTypeEnum fromString(String msg){
+    public static MessageTypeEnum fromString(String msg) {
         for (MessageTypeEnum s : MessageTypeEnum.values()) {
             if (s.name().equalsIgnoreCase(msg)) {
                 return s;

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class UpdateStatusTeamJoinRequest {
-  private String userId;
-  private String teamId;
-  private boolean decision;
+    private String userId;
+    private String teamId;
+    private boolean decision;
 }

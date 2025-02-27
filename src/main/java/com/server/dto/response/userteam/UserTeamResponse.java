@@ -2,7 +2,6 @@ package com.server.dto.response.userteam;
 
 import com.server.dto.response.team.TeamResponse;
 import com.server.dto.response.user.UserMinimalResponse;
-import com.server.dto.response.user.UserResponse;
 import com.server.enums.RoleEnum;
 import com.server.enums.StatusEnum;
 import lombok.Getter;

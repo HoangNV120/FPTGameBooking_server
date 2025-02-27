@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class CreateRoomRequest extends BaseRoom{
+public class CreateRoomRequest extends BaseRoom {
 
 }

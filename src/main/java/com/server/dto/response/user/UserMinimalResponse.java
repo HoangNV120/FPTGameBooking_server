@@ -1,7 +1,6 @@
 package com.server.dto.response.user;
 
 import com.server.enums.LevelEnum;
-import com.server.enums.RoleEnum;
 import com.server.enums.StatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +11,7 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserMinimalResponse  {
+public class UserMinimalResponse {
     private String id;
     private String name;
     private LevelEnum level;
