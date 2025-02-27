@@ -6,11 +6,16 @@ import com.server.dto.response.common.PageableObject;
 import com.server.dto.response.common.ResponseGlobal;
 import com.server.dto.response.transaction.TransactionMinimalResponse;
 import com.server.dto.response.transaction.TransactionResponse;
+import com.server.dto.response.user.UserResponse;
 import com.server.service.QrGenerateService;
 import com.server.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -59,6 +64,20 @@ public class TransactionRestController {
     public ResponseGlobal<PageableObject<TransactionResponse>> viewTransaction(@RequestBody FindTransactionRequest request) {
         log.info("findTransaction: request = {}", request.toString());
         return new ResponseGlobal<>(transactionService.searchTransaction(request));
+    }
+
+    @GetMapping("/exportToExcelTransactions")
+    public ResponseEntity<byte[]> exportToExcelTransactions() {
+        List<TransactionResponse> transactionResponses = transactionService.getAllTransactions();
+        byte[] excelData = transactionService.exportToExcelTransactions(transactionResponses);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDisposition(ContentDisposition.attachment().filename("transactions.xlsx").build());
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(excelData);
     }
 
 }

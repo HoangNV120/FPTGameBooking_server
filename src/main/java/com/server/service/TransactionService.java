@@ -6,6 +6,7 @@ import com.server.dto.response.common.PageableObject;
 import com.server.dto.response.transaction.TransactionMinimalResponse;
 import com.server.dto.response.transaction.TransactionResponse;
 
+import com.server.entity.Transaction;
 import java.util.List;
 
 public interface TransactionService {
@@ -18,4 +19,6 @@ public interface TransactionService {
     PageableObject<TransactionMinimalResponse> searchTransactionById(FindTransactionRequest request);
 
     PageableObject<TransactionResponse> searchTransaction(FindTransactionRequest request);
+    List<TransactionResponse> getAllTransactions();
+    byte[] exportToExcelTransactions(List<TransactionResponse> transactions);
 }

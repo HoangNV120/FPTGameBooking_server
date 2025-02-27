@@ -8,6 +8,7 @@ import com.server.dto.response.tournamentmatch.TournamentMatchResponse;
 import java.util.List;
 
 public interface TournamentMatchService {
+
     List<TournamentMatchResponse> submitTournamentMatches(ListSubmitTournamentMatch request);
 
     TournamentMatchResponse updateMatchScore(UpdateScoreTournamentMatch request);

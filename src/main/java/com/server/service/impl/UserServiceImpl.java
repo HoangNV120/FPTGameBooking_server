@@ -19,9 +19,15 @@ import com.server.repository.UserRepository;
 import com.server.repository.specifications.UserSpecification;
 import com.server.service.UserService;
 import jakarta.persistence.EntityManager;
+import java.io.ByteArrayOutputStream;
+import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -148,9 +154,9 @@ public class UserServiceImpl implements UserService {
      * @param user đối tượng User cần chuyển đổi.
      * @return UserResponse chứa thông tin người dùng.
      */
-    private UserResponse convertUser(User user) {
-        return modelMapper.map(user, UserResponse.class);
-    }
+        private UserResponse convertUser(User user) {
+            return modelMapper.map(user, UserResponse.class);
+        }
 
     /**
      * Tìm người dùng theo email.
@@ -210,6 +216,50 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         return new UserImageResponse(uploadResult.get("secure_url").toString());
+    }
+
+    @Override
+    public byte[] exportToExcel(List<UserResponse> userResponses) {
+        try (
+                XSSFWorkbook workbook = new XSSFWorkbook();
+                ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            XSSFSheet sheet = workbook.createSheet("Users");
+            XSSFRow headerRow = sheet.createRow(0);
+
+            String[] headers = {"Stt", "ID", "Name", "Email", "Point", "Level", "Role", "Status", "Avatar", "Created Date", "Updated Date"};
+            for (int i = 0; i < headers.length; i++) {
+                headerRow.createCell(i).setCellValue(headers[i]);
+            }
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            int rowIdx = 1; // Bắt đầu từ dòng 1
+            int stt = 1; // STT bắt đầu từ 1
+            for (UserResponse user : userResponses) {
+                XSSFRow row = sheet.createRow(rowIdx++);
+                row.createCell(0).setCellValue(stt++); // Cột STT bắt đầu từ 1
+                row.createCell(1).setCellValue(user.getId());
+                row.createCell(2).setCellValue(user.getName());
+                row.createCell(3).setCellValue(user.getEmail());
+                row.createCell(4).setCellValue(user.getPoint());
+                row.createCell(5).setCellValue(user.getLevel().toString());
+                row.createCell(6).setCellValue(user.getRole().toString());
+                row.createCell(7).setCellValue(user.getStatus().toString());
+                row.createCell(8).setCellValue(user.getAvatar());
+                row.createCell(9).setCellValue(user.getCreatedDate() != null ? user.getCreatedDate().format(formatter) : "");
+                row.createCell(10).setCellValue(user.getUpdatedDate() != null ? user.getUpdatedDate().format(formatter) : "");
+            }
+
+            workbook.write(out);
+            return out.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to export Excel file", e);
+        }
+    }
+
+
+    @Override
+    public List<UserResponse> findAllUsers() {
+        return userRepository.findAll().stream().map(this::convertUser).collect(Collectors.toList());
     }
 
     private void deleteImage(String publicId) {

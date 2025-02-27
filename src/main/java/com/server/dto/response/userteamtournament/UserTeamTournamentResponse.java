@@ -9,4 +9,5 @@ import lombok.Setter;
 public class UserTeamTournamentResponse {
     private UserMinimalResponse user;
     private String teamRole;
+    private String teamId;
 }

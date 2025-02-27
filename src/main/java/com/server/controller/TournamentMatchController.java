@@ -18,6 +18,7 @@ public class TournamentMatchController {
 
     private final TournamentMatchService tournamentMatchService;
 
+
     @PostMapping("/submit")
     public ResponseGlobal<List<TournamentMatchResponse>> submitTournamentMatches(@RequestBody ListSubmitTournamentMatch request) {
         List<TournamentMatchResponse> response = tournamentMatchService.submitTournamentMatches(request);

@@ -48,7 +48,10 @@ public class UserTeamTournamentServiceImpl implements UserTeamTournamentService 
         if (userTeamTournament.isEmpty()) {
             throw new RestApiException("UserTeamTournament not found");
         }
-        return ToResponse(userTeamTournament.get());
+        UserTeamTournament userTeamTournament1 = userTeamTournament.get();
+        UserTeamTournamentResponse response = ToResponse(userTeamTournament1);
+        response.setTeamId(userTeamTournament1.getTeam().getId());
+        return response;
     }
 
 
