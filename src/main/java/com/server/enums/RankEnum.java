@@ -12,8 +12,7 @@ public enum RankEnum {
     GOLD(2, "Hạng Vàng"),
     PLATINUM(3, "Hạng Bạch Kim"),
     DIAMOND(4, "Hạng Kim Cương"),
-    CHALLENGER(5, "Hạng Thách Đấu")
-    ;
+    CHALLENGER(5, "Hạng Thách Đấu");
 
     private final Integer value;
     private final String description;

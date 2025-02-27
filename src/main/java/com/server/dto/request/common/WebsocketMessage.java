@@ -3,7 +3,6 @@ package com.server.dto.request.common;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Value;
 
 @Builder
 @Setter

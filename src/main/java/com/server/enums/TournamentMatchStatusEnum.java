@@ -7,9 +7,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum TournamentMatchStatusEnum {
-    WAITING(1,"WAITING"),
-    ONGOING(2,"ONGOING"),
-    ENDED(3,"ENDED");
+    WAITING(1, "WAITING"),
+    ONGOING(2, "ONGOING"),
+    ENDED(3, "ENDED");
 
     private final Integer value;
     private final String description;

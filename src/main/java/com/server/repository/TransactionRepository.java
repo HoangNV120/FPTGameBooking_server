@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface TransactionRepository extends JpaRepository<Transaction,String>, JpaSpecificationExecutor<Transaction> {
+public interface TransactionRepository extends JpaRepository<Transaction, String>, JpaSpecificationExecutor<Transaction> {
     List<Transaction> findByTransactionStatus(TransactionEnum transactionStatus);
 }

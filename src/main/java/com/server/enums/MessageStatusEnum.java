@@ -22,7 +22,7 @@ public enum MessageStatusEnum {
      * @return MessageStatusEnum tương ứng với tên enum.
      * @throws IllegalArgumentException nếu không tìm thấy enum tương ứng.
      */
-    public static MessageStatusEnum fromString(String msg){
+    public static MessageStatusEnum fromString(String msg) {
         for (MessageStatusEnum s : MessageStatusEnum.values()) {
             if (s.name().equalsIgnoreCase(msg)) {
                 return s;

@@ -33,6 +33,7 @@ public interface UserTeamRepository extends JpaRepository<UserTeam, String> {
     List<UserTeam> findUserTeamByTeam_Room_Code(String codeRoom);
 
     List<UserTeam> findUserTeamByUser_Id(String userId);
+
     List<UserTeam> findUserTeamByUser_IdAndStatus(String userId, StatusEnum status);
 
     boolean existsUserTeamByTeam_IdAndRole(String teamId, RoleEnum role);

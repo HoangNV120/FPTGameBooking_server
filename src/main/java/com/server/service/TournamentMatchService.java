@@ -1,4 +1,16 @@
 package com.server.service;
 
+import com.server.dto.request.tournamentmatch.ListSubmitTournamentMatch;
+import com.server.dto.request.tournamentmatch.TournamentMatchRequest;
+import com.server.dto.request.tournamentmatch.UpdateScoreTournamentMatch;
+import com.server.dto.response.tournamentmatch.TournamentMatchResponse;
+
+import java.util.List;
+
 public interface TournamentMatchService {
+    List<TournamentMatchResponse> createTournamentMatches(List<TournamentMatchRequest> matchRequests);
+
+    List<TournamentMatchResponse> submitTournamentMatches(ListSubmitTournamentMatch request);
+
+    TournamentMatchResponse updateMatchScore(UpdateScoreTournamentMatch request);
 }

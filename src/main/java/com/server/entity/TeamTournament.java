@@ -32,6 +32,6 @@ public class TeamTournament extends AuditTable {
     @Column(columnDefinition = "TINYINT(1) DEFAULT 0")
     private boolean isDeleted;
 
-    @OneToMany(mappedBy = "team",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "team", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserTeamTournament> userTeamTournaments;
 }

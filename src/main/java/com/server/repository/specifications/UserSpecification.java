@@ -1,10 +1,10 @@
 package com.server.repository.specifications;
 
+import com.server.dto.request.user.FindUserRequest;
 import com.server.entity.User;
 import com.server.enums.LevelEnum;
 import com.server.enums.StatusEnum;
 import org.springframework.data.jpa.domain.Specification;
-import com.server.dto.request.user.FindUserRequest;
 
 public class UserSpecification {
 

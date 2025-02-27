@@ -16,8 +16,8 @@ public class SystemStreamLinkRestController {
 
     @PutMapping("/update")
     public ResponseGlobal<SystemStreamLinkResponse> updateSystemStreamLink(@RequestBody SystemStreamLinkRequest systemStreamLinkRequest) {
-            SystemStreamLinkResponse systemStreamLinkResponse = systemStreamLinkService.updateStreamLink(systemStreamLinkRequest);
-            return new ResponseGlobal<>(systemStreamLinkResponse);
+        SystemStreamLinkResponse systemStreamLinkResponse = systemStreamLinkService.updateStreamLink(systemStreamLinkRequest);
+        return new ResponseGlobal<>(systemStreamLinkResponse);
     }
 
     @GetMapping("/view")

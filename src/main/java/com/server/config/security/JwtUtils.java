@@ -40,11 +40,11 @@ public class JwtUtils {
         return null;
     }
 
-    public String generateJwtToken(UserDetails userDetails,String userId) {
+    public String generateJwtToken(UserDetails userDetails, String userId) {
         String username = userDetails.getUsername();
         return Jwts.builder()
                 .subject(username)
-                .claim("userId",userId)
+                .claim("userId", userId)
                 .issuedAt(new Date())
                 .expiration(new Date((new Date()).getTime() + jwtExpirationMsToken))
                 .signWith(key())

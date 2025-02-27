@@ -10,8 +10,7 @@ public enum StatusEnum {
     ACTIVE(0, "Đang hoạt động"),
     INACTIVE(1, "Không hoạt động"),
     PENDING(2, "Chờ phê duyệt hoặc xử lý"),
-    DISCONTINUED(3, "Ngừng phát hành hoặc không còn khả dụng")
-    ;
+    DISCONTINUED(3, "Ngừng phát hành hoặc không còn khả dụng");
 
     private final Integer value;
     private final String description;

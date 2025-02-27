@@ -7,6 +7,6 @@ import lombok.ToString;
 @Setter
 @Getter
 @ToString
-public class UpdateTeamRequest extends BaseTeam{
+public class UpdateTeamRequest extends BaseTeam {
     private String id;
 }

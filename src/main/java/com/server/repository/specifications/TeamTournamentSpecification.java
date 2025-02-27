@@ -2,10 +2,9 @@ package com.server.repository.specifications;
 
 import com.server.entity.TeamTournament;
 import com.server.entity.UserTeamTournament;
-import org.springframework.data.jpa.domain.Specification;
-
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import org.springframework.data.jpa.domain.Specification;
 
 public class TeamTournamentSpecification {
 

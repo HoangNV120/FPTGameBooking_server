@@ -5,11 +5,7 @@ import com.server.entity.common.AuditTable;
 import com.server.enums.RoleEnum;
 import com.server.enums.StatusEnum;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter

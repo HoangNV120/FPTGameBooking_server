@@ -17,8 +17,8 @@ public class UserHandshakeHandler extends DefaultHandshakeHandler {
     /**
      * Phương thức xác định người dùng dựa trên `userId` từ WebSocket request.
      *
-     * @param request   yêu cầu HTTP khởi tạo WebSocket.
-     * @param wsHandler trình xử lý WebSocket.
+     * @param request    yêu cầu HTTP khởi tạo WebSocket.
+     * @param wsHandler  trình xử lý WebSocket.
      * @param attributes các thuộc tính cho phiên WebSocket.
      * @return đối tượng Principal đại diện cho người dùng.
      */

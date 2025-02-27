@@ -6,11 +6,13 @@ import com.server.dto.response.common.PageableObject;
 import com.server.dto.response.common.ResponseGlobal;
 import com.server.dto.response.transaction.TransactionMinimalResponse;
 import com.server.dto.response.transaction.TransactionResponse;
-import com.server.dto.response.userteam.UserTeamResponse;
 import com.server.entity.Notification;
 import com.server.entity.Transaction;
 import com.server.entity.User;
-import com.server.enums.*;
+import com.server.enums.LevelEnum;
+import com.server.enums.NotificationEnum;
+import com.server.enums.RoleEnum;
+import com.server.enums.TransactionEnum;
 import com.server.exceptions.NotFoundExceptionHandler;
 import com.server.exceptions.RestApiException;
 import com.server.repository.TransactionRepository;
@@ -20,7 +22,6 @@ import com.server.service.EmailService;
 import com.server.service.NotificationService;
 import com.server.service.TransactionService;
 import com.server.service.UserService;
-import com.server.util.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -32,9 +33,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -106,7 +105,7 @@ public class TransactionServiceImpl implements TransactionService {
         String name = userService.findByEmail(userEmail).getName();
         String amount = new DecimalFormat("#,### VNĐ").format(new BigDecimal(request.getAmount()));
         // Gửi email thông báo cho admin
-        emailService.sendEmailPurchasePointRequest(formattedDate, adminEmail, savedTransaction.getId(),request.getUserId(),
+        emailService.sendEmailPurchasePointRequest(formattedDate, adminEmail, savedTransaction.getId(), request.getUserId(),
                 userEmail, name, pointsToAdd, amount);
 
         return response;
@@ -236,7 +235,7 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.findAll(specification, PageRequest.of(request.getPageNo(), request.getPageSize()));
     }
 
-    private TransactionResponse convertTransaction(Transaction transaction){
+    private TransactionResponse convertTransaction(Transaction transaction) {
         TransactionResponse response = modelMapper.map(transaction, TransactionResponse.class);
         response.setStatus(TransactionEnum.fromValue(transaction.getTransactionStatus().getValue()));
         return response;

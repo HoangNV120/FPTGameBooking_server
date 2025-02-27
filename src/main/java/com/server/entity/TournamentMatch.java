@@ -1,10 +1,13 @@
 package com.server.entity;
 
 import com.server.entity.common.AuditTable;
-import com.server.enums.MatchStatusEnum;
+import com.server.enums.MatchStageEnum;
 import com.server.enums.MatchTypeEnum;
+import com.server.enums.TournamentMatchStatusEnum;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -24,11 +27,11 @@ public class TournamentMatch extends AuditTable {
 
     @ManyToOne
     @JoinColumn(name = "team1_id")
-    private TeamTournament team1;
+    private TeamTournamentParticipation team1;
 
     @ManyToOne
     @JoinColumn(name = "team2_id")
-    private TeamTournament team2;
+    private TeamTournamentParticipation team2;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum('BO1','BO3','BO5')")
@@ -42,7 +45,16 @@ public class TournamentMatch extends AuditTable {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum('WAITING','ONGOING','ENDED') DEFAULT 'WAITING'")
-    private MatchStatusEnum status;
+    private TournamentMatchStatusEnum status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "enum('QUARTER_FINALS', 'SEMI_FINALS', 'FINALS')")
+    private MatchStageEnum stage;
+
+    private int matchOrder;
+
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
 
     private String streamLink;
 }

@@ -67,7 +67,7 @@ public class AuthServiceImpl implements AuthService {
             throw new NotFoundExceptionHandler("Tài khoản hoặc mật khẩu không đúng.");
         }
 
-        if(optionalUser.get().getStatus().equals(StatusEnum.INACTIVE)){
+        if (optionalUser.get().getStatus().equals(StatusEnum.INACTIVE)) {
             throw new NotFoundExceptionHandler("Tài khoản chưa được kích hoạt vui lòng check mail xác nhận!");
         }
 
@@ -119,12 +119,12 @@ public class AuthServiceImpl implements AuthService {
         log.info("SignInRequest: {}", req);
 
         userRepository.findFirstByEmailOrName(req.getEmail(), req.getName())
-            .ifPresent(user -> {
-                if (user.getEmail().equals(req.getEmail())) {
-                    throw new RestApiException("Gmail đã tồn tại.");
-                }
-                throw new RestApiException("Tên InGame đã tồn tại.");
-            });
+                .ifPresent(user -> {
+                    if (user.getEmail().equals(req.getEmail())) {
+                        throw new RestApiException("Gmail đã tồn tại.");
+                    }
+                    throw new RestApiException("Tên InGame đã tồn tại.");
+                });
 
         User user = new User();
         user.setEmail(req.getEmail());
@@ -208,7 +208,6 @@ public class AuthServiceImpl implements AuthService {
         log.info("✅ Password reset successful for user: {}", user.getId());
         return "Đã đặt lại mật khẩu thành công!";
     }
-
 
 
 }

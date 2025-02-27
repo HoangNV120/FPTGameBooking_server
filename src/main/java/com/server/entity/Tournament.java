@@ -4,6 +4,7 @@ import com.server.entity.common.AuditTable;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -46,6 +47,10 @@ public class Tournament extends AuditTable {
 
     @Column(columnDefinition = "INT DEFAULT NULL")
     private Integer teamMemberCount;
+
+    LocalDateTime startDate;
+
+    LocalDateTime endDate;
 
     @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TeamTournamentParticipation> teamTournamentParticipations;

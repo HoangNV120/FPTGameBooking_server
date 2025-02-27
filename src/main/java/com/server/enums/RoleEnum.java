@@ -11,8 +11,7 @@ public enum RoleEnum {
     ROLE_USER(1, "User"),
     ROLE_ROOM_OWNER(2, "Room Owner"),
     ROLE_MEMBER(3, "Member"),
-    ROLE_TEAM_LEADER(4, "Team Leader")
-    ;
+    ROLE_TEAM_LEADER(4, "Team Leader");
 
     private final Integer value;
     private final String description;

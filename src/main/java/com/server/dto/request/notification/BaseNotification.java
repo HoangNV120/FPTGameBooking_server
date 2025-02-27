@@ -1,6 +1,5 @@
 package com.server.dto.request.notification;
 
-import com.server.dto.response.user.UserMinimalResponse;
 import com.server.entity.User;
 import com.server.enums.NotificationEnum;
 import lombok.Getter;

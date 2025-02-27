@@ -9,7 +9,7 @@ import com.server.service.common.BaseService;
 public interface RoomService extends BaseService<RoomResponse, CreateRoomRequest,
         UpdateRoomRequest, FindRoomRequest> {
 
-    RoomResponse findRoomByCode (String code);
+    RoomResponse findRoomByCode(String code);
 
-    RoomResponse removeRoom(String codeGame,String codeRoom, String name);
+    RoomResponse removeRoom(String codeGame, String codeRoom, String name);
 }

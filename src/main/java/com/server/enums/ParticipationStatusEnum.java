@@ -7,9 +7,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ParticipationStatusEnum {
-    PARTICIPATING(1,"PARTICIPATING"),
-    STARTED(2,"STARTED"),
-    ENDED(3,"ENDED");
+    PENDING(1, "PENDING"),
+    PARTICIPATING(2, "PARTICIPATING"),
+    STARTED(3, "STARTED"),
+    ENDED(4, "ENDED");
 
     private final Integer value;
     private final String description;

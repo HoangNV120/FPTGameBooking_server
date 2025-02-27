@@ -21,8 +21,7 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+      enabled: false
 
   # email
   mail:
@@ -54,6 +53,6 @@ logging:
         SQL: DEBUG
 
 cloudinary:
-    cloudName: "db8h1vnhj"
-    apiKey: "652637162123458"
-    apiSecret: "9zLG59ruEvs4KlMzpxT1FFd4xEg"
+  cloudName: "db8h1vnhj"
+  apiKey: "652637162123458"
+  apiSecret: "9zLG59ruEvs4KlMzpxT1FFd4xEg"
