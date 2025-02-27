@@ -80,6 +80,7 @@ public class SecurityConfig {
             "/api/v1/room/delete-room",
             "/api/v1/transactions/update-transaction",
             "/api/v1/system-stream-link/update",
+            "/api/v1/user/exportToExcel",
     };
 
     @Bean

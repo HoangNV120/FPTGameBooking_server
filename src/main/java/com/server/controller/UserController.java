@@ -10,12 +10,18 @@ import com.server.dto.response.user.UserImageResponse;
 import com.server.dto.response.user.UserResponse;
 import com.server.service.UserService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import org.springframework.http.HttpHeaders;
+
 
 @Slf4j
 @RestController
@@ -92,4 +98,17 @@ public class UserController {
         return new ResponseGlobal<>(userService.getById(request.getUserId()));
     }
 
+    @GetMapping("/exportToExcel")
+    public ResponseEntity<byte[]> exportToExcel() {
+        List<UserResponse> userResponses = userService.findAllUsers();
+        byte[] excelData = userService.exportToExcel(userResponses);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDisposition(ContentDisposition.attachment().filename("users.xls").build());
+
+        return ResponseEntity.ok()
+            .headers(headers)
+            .body(excelData);
+    }
 }
