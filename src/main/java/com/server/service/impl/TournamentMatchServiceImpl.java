@@ -38,93 +38,6 @@ public class TournamentMatchServiceImpl implements TournamentMatchService {
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
 
-    @Override
-    @Transactional
-    public List<TournamentMatchResponse> createTournamentMatches(List<TournamentMatchRequest> matchRequests) {
-        if (matchRequests.isEmpty()) {
-            throw new RestApiException("Match request list cannot be empty");
-        }
-
-        String tournamentId = matchRequests.get(0).getTournamentId();
-
-        for (TournamentMatchRequest request : matchRequests) {
-            if (!request.getTournamentId().equals(tournamentId)) {
-                throw new RestApiException("All tournament IDs in the request list must be the same");
-            }
-        }
-
-        Tournament tournament = tournamentRepository.findById(tournamentId)
-                .orElseThrow(() -> new RestApiException("Tournament not found"));
-
-        int numberOfTeams = tournament.getNumberOfTeam();
-        int expectedMatches = numberOfTeams - 1;
-
-        if (matchRequests.size() != expectedMatches) {
-            throw new RestApiException("Invalid number of matches for the given number of teams");
-        }
-
-        LocalDateTime latestEndDate = null;
-
-        for (TournamentMatchRequest request : matchRequests) {
-            if (Duration.between(request.getStartDate(), request.getEndDate()).toMinutes() < 30) {
-                throw new RestApiException("Match duration must be at least 30 minutes");
-            }
-
-            if (latestEndDate != null && request.getStartDate().isBefore(latestEndDate)) {
-                throw new RestApiException("Match start date must be after the previous match end date");
-            }
-
-            if (request.getStartDate().isBefore(tournament.getStartDate()) || request.getEndDate().isAfter(tournament.getEndDate())) {
-                throw new RestApiException("Match dates must be within the tournament dates");
-            }
-
-            latestEndDate = request.getEndDate();
-        }
-
-        try {
-            List<TournamentMatch> matches = matchRequests.stream()
-                    .map(request -> {
-                        TournamentMatch match = modelMapper.map(request, TournamentMatch.class);
-                        match.setTournament(tournament);
-                        match.setStatus(TournamentMatchStatusEnum.WAITING);
-                        match.setTeam1Score(0);
-                        match.setTeam2Score(0);
-                        return match;
-                    })
-                    .collect(Collectors.toList());
-
-            // Assign match order and stage
-            for (int i = 0; i < matches.size(); i++) {
-                TournamentMatch match = matches.get(i);
-                match.setMatchOrder(i + 1);
-
-                if (matches.size() == 3) {
-                    if (i < 2) {
-                        match.setStage(MatchStageEnum.SEMI_FINALS);
-                    } else {
-                        match.setStage(MatchStageEnum.FINALS);
-                    }
-                } else if (matches.size() == 7) {
-                    if (i < 4) {
-                        match.setStage(MatchStageEnum.QUARTER_FINALS);
-                    } else if (i < 6) {
-                        match.setStage(MatchStageEnum.SEMI_FINALS);
-                    } else {
-                        match.setStage(MatchStageEnum.FINALS);
-                    }
-                }
-            }
-
-            matchRepository.saveAll(matches);
-
-            return matches.stream()
-                    .map(match -> modelMapper.map(match, TournamentMatchResponse.class))
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            tournamentRepository.delete(tournament);
-            throw new RestApiException("Failed to create matches, tournament has been deleted");
-        }
-    }
 
     @Override
     @Transactional
@@ -132,7 +45,7 @@ public class TournamentMatchServiceImpl implements TournamentMatchService {
         Tournament tournament = tournamentRepository.findById(request.getTournamentId())
                 .orElseThrow(() -> new RestApiException("Tournament not found"));
 
-        if (!tournament.getUserCreate().equals(request.getUserId())) {
+        if (!tournament.getUserCreate().equals(request.getUserId())&&!request.getUserId().equals("system")) {
             throw new RestApiException("Unauthorized");
         }
 

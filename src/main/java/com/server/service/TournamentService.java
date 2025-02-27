@@ -11,4 +11,5 @@ public interface TournamentService {
     TournamentResponse getTournamentById(String id);
 
     TournamentResponse createTournament(TournamentRequest request);
+    void checkAndUpdateTournamentStatus();
 }

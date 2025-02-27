@@ -18,12 +18,6 @@ public class TournamentMatchController {
 
     private final TournamentMatchService tournamentMatchService;
 
-    @PostMapping("/create")
-    public ResponseGlobal<List<TournamentMatchResponse>> createTournamentMatches(@RequestBody List<TournamentMatchRequest> matchRequests) {
-        List<TournamentMatchResponse> response = tournamentMatchService.createTournamentMatches(matchRequests);
-        return new ResponseGlobal<>(response);
-    }
-
     @PostMapping("/submit")
     public ResponseGlobal<List<TournamentMatchResponse>> submitTournamentMatches(@RequestBody ListSubmitTournamentMatch request) {
         List<TournamentMatchResponse> response = tournamentMatchService.submitTournamentMatches(request);
