@@ -59,6 +59,16 @@ public class User extends AuditTable implements UserDetails {
     }
 
     @Override
+    public String getPassword() {
+        return this.password;
+    }
+
+
+    public String getFullName() {
+        return this.name;
+    }
+
+    @Override
     public boolean isAccountNonExpired() {
         return true;
     }
