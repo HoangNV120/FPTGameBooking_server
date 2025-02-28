@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/reels")
+@RequestMapping("/api/v1/reels")
 public class ReelController {
 
     private final ReelServiceImpl reelService;

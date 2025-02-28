@@ -12,5 +12,5 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public interface TeamTournamentService extends BaseService<TeamTournamentResponse, CreateTeamTournament, UpdateTeamTournament, FindTeamTournament> {
-    TeamTournamentImageResponse uploadImage(InputStream file, String teamId) throws IOException;
+    TeamTournamentImageResponse uploadImage(MultipartFile file, String teamId) throws IOException;
 }

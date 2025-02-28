@@ -46,10 +46,10 @@ public class TeamTournamentController {
         return new ResponseGlobal<>(response);
     }
 
-    @PostMapping(value = "/upload-image", consumes = "multipart/form-data")
+    @PostMapping(value = "/upload-image", consumes = {"multipart/form-data"})
     public ResponseGlobal<TeamTournamentImageResponse> uploadImage(@RequestParam("teamId") String teamId,
-                                                                   @RequestParam("file") InputStream inputStream) throws IOException {
-        TeamTournamentImageResponse response = teamTournamentService.uploadImage(inputStream, teamId);
+                                                                   @RequestParam("file") MultipartFile file) throws IOException {
+        TeamTournamentImageResponse response = teamTournamentService.uploadImage(file, teamId);
         return new ResponseGlobal<>(response);
     }
 }

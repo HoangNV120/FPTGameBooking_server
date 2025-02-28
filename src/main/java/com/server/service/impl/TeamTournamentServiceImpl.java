@@ -117,22 +117,22 @@ public class TeamTournamentServiceImpl implements TeamTournamentService {
     }
 
     @Override
-    public TeamTournamentImageResponse uploadImage(InputStream file, String teamId) throws IOException {
+    public TeamTournamentImageResponse uploadImage(MultipartFile file, String teamId) throws IOException {
         // Delete old image if exists
         deleteImage("team" + teamId);
 
-        // Upload new image
-        Map uploadResult = cloudinary.uploader().upload(file, ObjectUtils.asMap("public_id", "team" + teamId, "resource_type", "auto"));
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("public_id", "team" + teamId, "resource_type", "auto"));
 
-        // Get team tournament by ID
-        TeamTournament teamTournament = teamTournamentRepository.findById(teamId)
-                .orElseThrow(() -> new RestApiException("Team not found"));
+            // Get team tournament by ID
+            TeamTournament teamTournament = teamTournamentRepository.findById(teamId)
+                    .orElseThrow(() -> new RestApiException("Team not found"));
 
-        // Update team tournament image link
-        teamTournament.setImageLink(uploadResult.get("secure_url").toString());
-        teamTournamentRepository.save(teamTournament);
+            // Update team tournament image link
+            teamTournament.setImageLink(uploadResult.get("secure_url").toString());
+            teamTournamentRepository.save(teamTournament);
 
-        return new TeamTournamentImageResponse(uploadResult.get("secure_url").toString());
+            return new TeamTournamentImageResponse(uploadResult.get("secure_url").toString());
+
     }
 
 
