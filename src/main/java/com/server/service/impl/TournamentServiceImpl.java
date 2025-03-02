@@ -53,8 +53,9 @@ public class TournamentServiceImpl implements TournamentService {
         LocalDateTime now = LocalDateTime.now();
         return tournamentRepository.findAll().stream()
                 .filter(tournament -> now.isBefore(tournament.getStartDate()))
+                .sorted(Comparator.comparing(Tournament::getStartDate))
                 .map(this::convertToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

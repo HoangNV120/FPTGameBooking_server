@@ -5,9 +5,9 @@ spring:
   # database connection
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://157.66.27.80:3306/db_gamebooking?createDatabaseIfNotExist=true&serverTimezone=Asia/Ho_Chi_Minh
+    url: jdbc:mysql://161.248.146.42:25100/db_gamebooking_dev?createDatabaseIfNotExist=true&serverTimezone=Asia/Ho_Chi_Minh
     username: admin
-    password: your_password
+    password: admin123
   jpa:
     hibernate:
       ddl-auto: update
@@ -58,3 +58,6 @@ cloudinary:
   cloudName: "db8h1vnhj"
   apiKey: "652637162123458"
   apiSecret: "9zLG59ruEvs4KlMzpxT1FFd4xEg"
+
+gemini:
+  apiKey: "AIzaSyCbqUQxmy3FfUJcn2G7JvY_YAlkTzIgtpA"

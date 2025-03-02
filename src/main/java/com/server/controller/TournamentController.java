@@ -45,7 +45,7 @@ public class TournamentController {
         return new ResponseGlobal<>(tournamentResponse);
     }
 
-    @GetMapping
+    @GetMapping("/view")
     public ResponseGlobal<List<TournamentResponse>> getAllTournament() {
         List<TournamentResponse> tournamentResponse = tournamentService.getAllTournaments();
         return new ResponseGlobal<>(tournamentResponse);

@@ -30,6 +30,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 @Slf4j
@@ -118,21 +121,42 @@ public class TeamTournamentServiceImpl implements TeamTournamentService {
 
     @Override
     public TeamTournamentImageResponse uploadImage(MultipartFile file, String teamId) throws IOException {
-        // Delete old image if exists
-        deleteImage("team" + teamId);
+//        // Delete old image if exists
+//        deleteImage("team" + teamId);
+//
+//            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("public_id", "team" + teamId, "resource_type", "auto"));
+//
+//            // Get team tournament by ID
+//            TeamTournament teamTournament = teamTournamentRepository.findById(teamId)
+//                    .orElseThrow(() -> new RestApiException("Team not found"));
+//
+//            // Update team tournament image link
+//            teamTournament.setImageLink(uploadResult.get("secure_url").toString());
+//            teamTournamentRepository.save(teamTournament);
+//
+//            return new TeamTournamentImageResponse(uploadResult.get("secure_url").toString());
+        String uploadDir = "uploads/";
 
-            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("public_id", "team" + teamId, "resource_type", "auto"));
+        // Ensure the directory exists
+        Path uploadPath = Paths.get(uploadDir);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
 
-            // Get team tournament by ID
-            TeamTournament teamTournament = teamTournamentRepository.findById(teamId)
-                    .orElseThrow(() -> new RestApiException("Team not found"));
+        // Save the file to the specified directory
+        String fileName = "team" + teamId + "_" + file.getOriginalFilename();
+        Path filePath = uploadPath.resolve(fileName);
+        file.transferTo(filePath.toFile());
 
-            // Update team tournament image link
-            teamTournament.setImageLink(uploadResult.get("secure_url").toString());
-            teamTournamentRepository.save(teamTournament);
+        // Get team tournament by ID
+        TeamTournament teamTournament = teamTournamentRepository.findById(teamId)
+                .orElseThrow(() -> new RestApiException("Team not found"));
 
-            return new TeamTournamentImageResponse(uploadResult.get("secure_url").toString());
+        // Update team tournament image link
+        teamTournament.setImageLink(filePath.toString());
+        teamTournamentRepository.save(teamTournament);
 
+        return new TeamTournamentImageResponse(filePath.toString());
     }
 
 
