@@ -17,8 +17,7 @@ public class TournamentRequest {
     @NotNull(message = "Tên giải đấu không được để trống")
     private String name;
 
-    @Pattern(regexp = "[48]", message = "Số lượng đội không hợp lệ")
-    private int numberOfTeam;
+    private Integer numberOfTeam;
     private String description;
     @NotNull(message = "Phần thưởng không được để trống")
     private Integer totalPrize;
@@ -30,8 +29,9 @@ public class TournamentRequest {
     @NotNull(message = "Ngày kết thúc không được để trống")
     private LocalDateTime endDate;
 
-    @Pattern(regexp = "[56]", message = "Số lượng thành viên không hợp lệ")
     private Integer teamMemberCount;
+
+    private boolean thirdPlaceMatch;
 
     List<TournamentMatchRequest> tournamentMatchRequests;
 

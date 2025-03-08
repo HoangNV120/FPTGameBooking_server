@@ -121,42 +121,21 @@ public class TeamTournamentServiceImpl implements TeamTournamentService {
 
     @Override
     public TeamTournamentImageResponse uploadImage(MultipartFile file, String teamId) throws IOException {
-//        // Delete old image if exists
-//        deleteImage("team" + teamId);
-//
-//            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("public_id", "team" + teamId, "resource_type", "auto"));
-//
-//            // Get team tournament by ID
-//            TeamTournament teamTournament = teamTournamentRepository.findById(teamId)
-//                    .orElseThrow(() -> new RestApiException("Team not found"));
-//
-//            // Update team tournament image link
-//            teamTournament.setImageLink(uploadResult.get("secure_url").toString());
-//            teamTournamentRepository.save(teamTournament);
-//
-//            return new TeamTournamentImageResponse(uploadResult.get("secure_url").toString());
-        String uploadDir = "uploads/";
+        // Delete old image if exists
+        deleteImage("team" + teamId);
 
-        // Ensure the directory exists
-        Path uploadPath = Paths.get(uploadDir);
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
-
-        // Save the file to the specified directory
-        String fileName = "team" + teamId + "_" + file.getOriginalFilename();
-        Path filePath = uploadPath.resolve(fileName);
-        file.transferTo(filePath.toFile());
+        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("public_id", "team" + teamId, "resource_type", "auto"));
 
         // Get team tournament by ID
         TeamTournament teamTournament = teamTournamentRepository.findById(teamId)
                 .orElseThrow(() -> new RestApiException("Team not found"));
 
         // Update team tournament image link
-        teamTournament.setImageLink(filePath.toString());
+        teamTournament.setImageLink(uploadResult.get("secure_url").toString());
         teamTournamentRepository.save(teamTournament);
 
-        return new TeamTournamentImageResponse(filePath.toString());
+        return new TeamTournamentImageResponse(uploadResult.get("secure_url").toString());
+
     }
 
 

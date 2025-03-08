@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TeamTournamentParticipationRepository extends JpaRepository<TeamTournamentParticipation, String> {
@@ -14,4 +15,7 @@ public interface TeamTournamentParticipationRepository extends JpaRepository<Tea
     List<TeamTournamentParticipation> findAllByTeamId(String teamId);
 
     long countByTournamentIdAndStatus(String tournamentId, ParticipationStatusEnum status);
+    Optional<TeamTournamentParticipation> findByTeamId(String teamId);
+    Optional<TeamTournamentParticipation> findByTeamIdAndTournamentId(String teamId, String tournamentId);
+
 }

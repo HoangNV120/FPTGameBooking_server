@@ -50,5 +50,7 @@ public interface UserTeamTournamentRepository extends JpaRepository<UserTeamTour
     Optional<UserTeamTournament> findByUserIdAndTeamId(String userId, String teamId);
     boolean existsByUserId(String userId);
 
+    Optional<UserTeamTournament> findByTeamIdAndTeamRole(String teamId, TeamTournamentRoleEnum role);
+
 
 }

@@ -3,6 +3,7 @@ package com.server.service.impl;
 import com.server.dto.request.teamtournamentparticipation.CreateTeamTournamentParticipation;
 import com.server.dto.request.teamtournamentparticipation.LeaveTeamTournamentParticipation;
 import com.server.dto.request.teamtournamentparticipation.UpdateTeamTournamentParticipation;
+import com.server.dto.response.teamtournament.TeamTournamentResponse;
 import com.server.dto.response.teamtournamentparticipation.TeamTournamentParticipationResponse;
 import com.server.entity.TeamTournament;
 import com.server.entity.TeamTournamentParticipation;
@@ -49,7 +50,7 @@ public class TeamTournamentParticipationServiceImpl implements TeamTournamentPar
                 .orElseThrow(() -> new RestApiException("Tournament not found"));
 
         // Check if the member count of the team matches the number of teams in the tournament
-        if (teamTournament.getMemberCount() != tournament.getNumberOfTeam()) {
+        if (teamTournament.getMemberCount() != tournament.getTeamMemberCount()) {
             throw new RestApiException("Team member count does not match the tournament requirement");
         }
 
@@ -62,13 +63,15 @@ public class TeamTournamentParticipationServiceImpl implements TeamTournamentPar
         // Create and save the participation
         TeamTournamentParticipation participation = modelMapper.map(request, TeamTournamentParticipation.class);
         participation.setStatus(ParticipationStatusEnum.PENDING);
+        participation.setTournament(tournament);
+        participation.setTeam(teamTournament);
         participation = participationRepository.save(participation);
         return convertToResponse(participation);
     }
 
     @Override
     public TeamTournamentParticipationResponse updateParticipation(UpdateTeamTournamentParticipation request) {
-        TeamTournamentParticipation participation = participationRepository.findById(request.getTournamentId())
+        TeamTournamentParticipation participation = participationRepository.findById(request.getTeamId())
                 .orElseThrow(() -> new RestApiException("Participation not found"));
 
         if (!participation.getTournament().getUserCreate().equals(request.getUserId())) {
@@ -79,6 +82,10 @@ public class TeamTournamentParticipationServiceImpl implements TeamTournamentPar
         long participatingTeamsCount = participationRepository.countByTournamentIdAndStatus(tournament.getId(), ParticipationStatusEnum.PARTICIPATING);
         if (participatingTeamsCount >= tournament.getNumberOfTeam()) {
             throw new RestApiException("Tournament is already full");
+        }
+
+        if(tournament.getStatus()!=null && !tournament.getStatus().equals("PENDING")){
+            throw new RestApiException("Tournament is already started");
         }
 
         if ("ACCEPT".equalsIgnoreCase(request.getStatus())) {
@@ -94,7 +101,8 @@ public class TeamTournamentParticipationServiceImpl implements TeamTournamentPar
 
     @Override
     public TeamTournamentParticipationResponse leaveTournament(LeaveTeamTournamentParticipation request) {
-        TeamTournamentParticipation participation = participationRepository.findById(request.getTournamentId())
+        TeamTournamentParticipation participation = participationRepository.findByTeamIdAndTournamentId(request.getTeamId(),
+                        request.getTournamentId())
                 .orElseThrow(() -> new RestApiException("Participation not found"));
 
         UserTeamTournament userTeamTournament = userTeamTournamentRepository.findByUserIdAndTeamId(request.getUserId(), request.getTeamId())
@@ -109,11 +117,52 @@ public class TeamTournamentParticipationServiceImpl implements TeamTournamentPar
         return convertToResponse(participation);
     }
 
+    @Override
+    public List<TeamTournamentParticipationResponse> getAllParticipationsByTournamentId(String id) {
+        return participationRepository.findAllByTournamentId(id).stream()
+                .map(this::convertToResponse)
+                .toList();
+    }
+
     private TeamTournamentParticipationResponse convertToResponse(TeamTournamentParticipation participation) {
         return modelMapper.map(participation, TeamTournamentParticipationResponse.class);
     }
 
     private TeamTournamentParticipation convertToEntity(CreateTeamTournamentParticipation request) {
         return modelMapper.map(request, TeamTournamentParticipation.class);
+    }
+
+    @Override
+    public TeamTournamentParticipationResponse getLeaderAndTeamByUserId(String userId) {
+        UserTeamTournament userTeamTournament = userTeamTournamentRepository
+                .findByUserId(userId)
+                .orElseThrow(() -> new RestApiException("User is not part of any team"));
+
+        // Get leader info
+        UserTeamTournament leader = userTeamTournamentRepository
+                .findByTeamIdAndTeamRole(userTeamTournament.getTeam().getId(), TeamTournamentRoleEnum.LEADER)
+                .orElseThrow(() -> new RestApiException("Team leader not found"));
+
+        TeamTournamentParticipation participation = new TeamTournamentParticipation();
+        participation.setTeam(userTeamTournament.getTeam());
+
+        TeamTournamentParticipationResponse participationResponse = convertToResponse(participation);
+        participationResponse.setLeaderId(leader.getUser().getId());
+        return participationResponse;
+    }
+
+    @Override
+    public TeamTournamentParticipationResponse getParticipationByTeamId(String teamId) {
+        TeamTournamentParticipation participation = participationRepository.findByTeamId(teamId)
+                .orElseThrow(() -> new RestApiException("Participation not found for team"));
+        return convertToResponse(participation);
+    }
+
+    @Override
+    public TeamTournamentParticipationResponse getParticipationByTeamIdAndTournamentId(String teamId, String tournamentId) {
+        TeamTournamentParticipation participation = participationRepository
+                .findByTeamIdAndTournamentId(teamId, tournamentId)
+                .orElseThrow(() -> new RestApiException("Participation not found"));
+        return convertToResponse(participation);
     }
 }

@@ -1,16 +1,18 @@
 package com.server.service.impl;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.server.constants.Constants;
 import com.server.dto.request.tournament.TournamentRequest;
+import com.server.dto.request.tournament.UpdateStreamLinkTournamentRequest;
 import com.server.dto.request.tournamentmatch.ListSubmitTournamentMatch;
 import com.server.dto.request.tournamentmatch.SubmitTournamentMatchRequest;
 import com.server.dto.request.tournamentmatch.TournamentMatchRequest;
+import com.server.dto.response.teamtournament.TeamTournamentImageResponse;
+import com.server.dto.response.tournament.TournamentImageResponse;
 import com.server.dto.response.tournament.TournamentResponse;
 import com.server.dto.response.tournamentmatch.TournamentMatchResponse;
-import com.server.entity.TeamTournamentParticipation;
-import com.server.entity.Tournament;
-import com.server.entity.TournamentMatch;
-import com.server.entity.User;
+import com.server.entity.*;
 import com.server.entity.common.AuditTable;
 import com.server.enums.MatchStageEnum;
 import com.server.enums.ParticipationStatusEnum;
@@ -28,11 +30,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,13 +51,13 @@ public class TournamentServiceImpl implements TournamentService {
     private final ModelMapper modelMapper;
     private final TournamentMatchService tournamentMatchService;
     private final TeamTournamentParticipationRepository teamTournamentParticipationRepository;
+    private final Cloudinary cloudinary;
 
 
     @Override
     public List<TournamentResponse> getAllTournaments() {
         LocalDateTime now = LocalDateTime.now();
         return tournamentRepository.findAll().stream()
-                .filter(tournament -> now.isBefore(tournament.getStartDate()))
                 .sorted(Comparator.comparing(Tournament::getStartDate))
                 .map(this::convertToResponse)
                 .toList();
@@ -76,6 +81,14 @@ public class TournamentServiceImpl implements TournamentService {
         int totalCost = request.getTotalPrize() + Constants.DEFAULT_TOURNAMENT_COST;
         if (user.getPoint() < totalCost) {
             throw new RestApiException("Insufficient points");
+        }
+
+        if (request.getNumberOfTeam() != 4 && request.getNumberOfTeam() != 8 && request.getNumberOfTeam() != 16) {
+            throw new RestApiException("Số lượng đội không hợp lệ");
+        }
+
+        if(request.getTeamMemberCount()!=5 && request.getTeamMemberCount()!=6){
+            throw new RestApiException("Số lượng thành viên không hợp lệ");
         }
 
         Tournament tournament = convertToEntity(request);
@@ -114,27 +127,12 @@ public class TournamentServiceImpl implements TournamentService {
 
         int numberOfTeams = tournament.getNumberOfTeam();
         int expectedMatches = numberOfTeams - 1;
+        if (tournament.isThirdPlaceMatch()) {
+            expectedMatches += 1;
+        }
 
         if (matchRequests.size() != expectedMatches) {
             throw new RestApiException("Invalid number of matches for the given number of teams");
-        }
-
-        LocalDateTime latestEndDate = null;
-
-        for (TournamentMatchRequest request : matchRequests) {
-            if (Duration.between(request.getStartDate(), request.getEndDate()).toMinutes() < 30) {
-                throw new RestApiException("Match duration must be at least 30 minutes");
-            }
-
-            if (latestEndDate != null && request.getStartDate().isBefore(latestEndDate)) {
-                throw new RestApiException("Match start date must be after the previous match end date");
-            }
-
-            if (request.getStartDate().isBefore(tournament.getStartDate()) || request.getEndDate().isAfter(tournament.getEndDate())) {
-                throw new RestApiException("Match dates must be within the tournament dates");
-            }
-
-            latestEndDate = request.getEndDate();
         }
 
         List<TournamentMatch> matches = matchRequests.stream()
@@ -153,24 +151,86 @@ public class TournamentServiceImpl implements TournamentService {
             TournamentMatch match = matches.get(i);
             match.setMatchOrder(i + 1);
 
-            if (matches.size() == 3) {
-                if (i < 2) {
-                    match.setStage(MatchStageEnum.SEMI_FINALS);
-                } else {
-                    match.setStage(MatchStageEnum.FINALS);
-                }
-            } else if (matches.size() == 7) {
-                if (i < 4) {
-                    match.setStage(MatchStageEnum.QUARTER_FINALS);
-                } else if (i < 6) {
-                    match.setStage(MatchStageEnum.SEMI_FINALS);
-                } else {
-                    match.setStage(MatchStageEnum.FINALS);
-                }
+            setMatchStage(match, i, numberOfTeams, tournament.isThirdPlaceMatch(),matches);
+        }
+
+        validateMatchTiming(matches);
+        tournamentMatchRepository.saveAll(matches);
+    }
+
+    private void setMatchStage(TournamentMatch match, int index, int numberOfTeams, boolean hasThirdPlace, List<TournamentMatch> matches) {
+        if (numberOfTeams == 4) {
+            if (index < 2) {
+                match.setStage(MatchStageEnum.SEMI_FINALS);
+            } else {
+                match.setStage(MatchStageEnum.FINALS);
+            }
+        } else if (numberOfTeams == 8) {
+            if (index < 4) {
+                match.setStage(MatchStageEnum.QUARTER_FINALS);
+            } else if (index < 6) {
+                match.setStage(MatchStageEnum.SEMI_FINALS);
+            } else {
+                match.setStage(MatchStageEnum.FINALS);
+            }
+        } else if (numberOfTeams == 16) {
+            if (index < 8) {
+                match.setStage(MatchStageEnum.ROUND_OF_16);
+            } else if (index < 12) {
+                match.setStage(MatchStageEnum.QUARTER_FINALS);
+            } else if (index < 14) {
+                match.setStage(MatchStageEnum.SEMI_FINALS);
+            } else {
+                match.setStage(MatchStageEnum.FINALS);
             }
         }
 
-        tournamentMatchRepository.saveAll(matches);
+        if (hasThirdPlace && index == matches.size() - 2) {
+            match.setStage(MatchStageEnum.THIRD_PLACE);
+        }
+    }
+
+    private void validateMatchTiming(List<TournamentMatch> matches) {
+        for (TournamentMatch match : matches) {
+            if (match.getStartDate() == null || match.getEndDate() == null) {
+                throw new RestApiException("Match start and end dates are required");
+            }
+
+            // Check for conflicts with matches of higher stages
+            for (TournamentMatch otherMatch : matches) {
+                if (match == otherMatch) continue;
+
+                boolean timeOverlap = isTimeOverlap(match, otherMatch);
+                boolean sameStage = match.getStage() == otherMatch.getStage();
+                boolean higherStage = isHigherStage(otherMatch.getStage(), match.getStage());
+
+                if (timeOverlap && higherStage) {
+                    throw new RestApiException("Match timing conflicts with a higher stage match: " +
+                            match.getStage() + " cannot overlap with " + otherMatch.getStage());
+                }
+            }
+        }
+    }
+
+    private boolean isTimeOverlap(TournamentMatch match1, TournamentMatch match2) {
+        return !match1.getEndDate().isBefore(match2.getStartDate()) &&
+                !match2.getEndDate().isBefore(match1.getStartDate());
+    }
+
+    private boolean isHigherStage(MatchStageEnum stage1, MatchStageEnum stage2) {
+        int stage1Order = getStageOrder(stage1);
+        int stage2Order = getStageOrder(stage2);
+        return stage1Order > stage2Order;
+    }
+
+    private int getStageOrder(MatchStageEnum stage) {
+        return switch (stage) {
+            case ROUND_OF_16 -> 1;
+            case QUARTER_FINALS -> 2;
+            case SEMI_FINALS -> 3;
+            case THIRD_PLACE -> 4;
+            case FINALS -> 5;
+        };
     }
 
     @Scheduled(fixedRate = 300000) // 5 minutes
@@ -179,7 +239,7 @@ public class TournamentServiceImpl implements TournamentService {
     public void checkAndUpdateTournamentStatus() {
         LocalDateTime now = LocalDateTime.now();
         List<Tournament> pendingTournaments = tournamentRepository.findAll().stream()
-                .filter(tournament -> tournament.getStartDate().isAfter(now) || tournament.getStartDate().isEqual(now))
+                .filter(tournament -> tournament.getStartDate().isBefore(now) || tournament.getStartDate().isEqual(now))
                 .filter(tournament -> "PENDING".equals(tournament.getStatus()))
                 .toList();
 
@@ -214,5 +274,44 @@ public class TournamentServiceImpl implements TournamentService {
                 .orElseThrow(() -> new RestApiException("User not found"));
         user.setPoint(user.getPoint() + tournament.getTotalPrize());
         userRepository.save(user);
+    }
+
+    @Override
+    public TournamentResponse updateStreamLink(UpdateStreamLinkTournamentRequest request) {
+        Tournament tournament = tournamentRepository.findById(request.getTournamentId())
+                .orElseThrow(() -> new RestApiException("Tournament not found"));
+
+        if (!tournament.getUserCreate().equals(request.getUserId())) {
+            throw new RestApiException("Unauthorized to update stream link");
+        }
+
+        tournament.setStreamLink(request.getStreamLink());
+        tournament = tournamentRepository.save(tournament);
+        return modelMapper.map(tournament, TournamentResponse.class);
+    }
+
+    @Override
+    public TournamentImageResponse uploadImage(MultipartFile file, String tournamentId) throws IOException {
+        deleteImage("tournament" + tournamentId);
+
+        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("public_id", "tournament" + tournamentId, "resource_type", "auto"));
+
+        // Get tournament by ID
+        Tournament tournament = tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> new RestApiException("Tournament not found"));
+
+        // Update team tournament image link
+        tournament.setLink(uploadResult.get("secure_url").toString());
+        tournamentRepository.save(tournament);
+
+        return new TournamentImageResponse(uploadResult.get("secure_url").toString());
+    }
+
+    private void deleteImage(String publicId) {
+        try {
+            cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+        } catch (Exception e) {
+            System.out.println("Cannot delete old image: " + e.getMessage());
+        }
     }
 }

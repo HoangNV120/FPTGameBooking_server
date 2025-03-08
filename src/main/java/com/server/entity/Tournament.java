@@ -23,7 +23,7 @@ public class Tournament extends AuditTable {
     private String name;
 
     @Column(nullable = false)
-    private int numberOfTeam;
+    private Integer numberOfTeam;
 
     @Column(nullable = false)
     private boolean flagDisplay;
@@ -48,9 +48,13 @@ public class Tournament extends AuditTable {
     @Column(columnDefinition = "INT DEFAULT NULL")
     private Integer teamMemberCount;
 
+    boolean thirdPlaceMatch;
+
     LocalDateTime startDate;
 
     LocalDateTime endDate;
+
+    private String streamLink;
 
     @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TeamTournamentParticipation> teamTournamentParticipations;

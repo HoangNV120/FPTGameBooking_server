@@ -29,4 +29,6 @@ public class TeamTournamentParticipation extends AuditTable {
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum('PENDING', 'PARTICIPATING', 'STARTED', 'ENDED') DEFAULT 'PENDING'")
     private ParticipationStatusEnum status;
+
+    private Integer place;
 }

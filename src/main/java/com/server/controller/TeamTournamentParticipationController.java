@@ -6,8 +6,11 @@ import com.server.dto.request.teamtournamentparticipation.UpdateTeamTournamentPa
 import com.server.dto.response.common.ResponseGlobal;
 import com.server.dto.response.teamtournamentparticipation.TeamTournamentParticipationResponse;
 import com.server.service.TeamTournamentParticipationService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/team-tournament-participations")
@@ -36,4 +39,28 @@ public class TeamTournamentParticipationController {
         TeamTournamentParticipationResponse response = participationService.leaveTournament(request);
         return new ResponseGlobal<>(response);
     }
+
+    @GetMapping("/find-by-tournament-id/{tournamentId}")
+    public ResponseGlobal<List<TeamTournamentParticipationResponse>> getParticipationByTournamentId(
+            @PathVariable String tournamentId) {
+        List<TeamTournamentParticipationResponse> response = participationService.getAllParticipationsByTournamentId(tournamentId);
+        return new ResponseGlobal<>(response);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseGlobal<TeamTournamentParticipationResponse> getLeaderAndTeamByUserId(
+            @PathVariable String userId) {
+        TeamTournamentParticipationResponse response = participationService.getLeaderAndTeamByUserId(userId);
+        return new ResponseGlobal<>(response);
+    }
+
+    @GetMapping("/team/{teamId}/tournament/{tournamentId}")
+    public ResponseGlobal<TeamTournamentParticipationResponse> getParticipationByTeamIdAndTournamentId(
+            @PathVariable String teamId,
+            @PathVariable String tournamentId) {
+        TeamTournamentParticipationResponse response = participationService.getParticipationByTeamIdAndTournamentId(teamId, tournamentId);
+        return new ResponseGlobal<>(response);
+    }
+
+
 }

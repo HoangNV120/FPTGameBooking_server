@@ -8,6 +8,13 @@ spring:
     url: jdbc:mysql://mysql:3306/db_gamebooking?createDatabaseIfNotExist=true&serverTimezone=Asia/Ho_Chi_Minh
     username: ${DB_USER}
     password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 100  # Tăng lên 50 kết nối nếu server chịu tải tốt
+      minimum-idle: 10  # Luôn giữ sẵn 10 kết nối
+      idle-timeout: 60000  # 60 giây để tránh đóng mở kết nối liên tục
+      max-lifetime: 1800000  # 30 phút (giữ nguyên)
+      connection-timeout: 10000  # 10 giây để tránh chờ đợi quá lâu
+
 
   jpa:
     hibernate:

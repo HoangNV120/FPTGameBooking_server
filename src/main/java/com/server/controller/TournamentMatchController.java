@@ -1,5 +1,6 @@
 package com.server.controller;
 
+import com.server.dto.request.tournamentmatch.FindTournamentMatch;
 import com.server.dto.request.tournamentmatch.ListSubmitTournamentMatch;
 import com.server.dto.request.tournamentmatch.TournamentMatchRequest;
 import com.server.dto.request.tournamentmatch.UpdateScoreTournamentMatch;
@@ -28,6 +29,12 @@ public class TournamentMatchController {
     @PutMapping("/update-score")
     public ResponseGlobal<TournamentMatchResponse> updateMatchScore(@RequestBody UpdateScoreTournamentMatch request) {
         TournamentMatchResponse response = tournamentMatchService.updateMatchScore(request);
+        return new ResponseGlobal<>(response);
+    }
+
+    @PostMapping("/find-by-tournament-id")
+    public ResponseGlobal<List<TournamentMatchResponse>> getTournamentMatches(@RequestBody FindTournamentMatch request) {
+        List<TournamentMatchResponse> response = tournamentMatchService.getTournamentMatches(request);
         return new ResponseGlobal<>(response);
     }
 }

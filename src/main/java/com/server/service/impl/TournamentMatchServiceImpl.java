@@ -1,9 +1,6 @@
 package com.server.service.impl;
 
-import com.server.dto.request.tournamentmatch.ListSubmitTournamentMatch;
-import com.server.dto.request.tournamentmatch.SubmitTournamentMatchRequest;
-import com.server.dto.request.tournamentmatch.TournamentMatchRequest;
-import com.server.dto.request.tournamentmatch.UpdateScoreTournamentMatch;
+import com.server.dto.request.tournamentmatch.*;
 import com.server.dto.response.tournamentmatch.TournamentMatchResponse;
 import com.server.entity.*;
 import com.server.enums.MatchStageEnum;
@@ -24,7 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -45,7 +44,7 @@ public class TournamentMatchServiceImpl implements TournamentMatchService {
         Tournament tournament = tournamentRepository.findById(request.getTournamentId())
                 .orElseThrow(() -> new RestApiException("Tournament not found"));
 
-        if (!tournament.getUserCreate().equals(request.getUserId())&&!request.getUserId().equals("system")) {
+        if (!tournament.getUserCreate().equals(request.getUserId()) && !request.getUserId().equals("system")) {
             throw new RestApiException("Unauthorized");
         }
 
@@ -61,17 +60,15 @@ public class TournamentMatchServiceImpl implements TournamentMatchService {
 
         List<TournamentMatch> matches = matchRepository.findAllByTournamentId(tournament.getId());
         for (SubmitTournamentMatchRequest matchRequest : request.getMatchRequests()) {
-            TournamentMatch match = matches.stream()
-                    .filter(m -> m.getMatchOrder() == matchRequest.getOrder())
-                    .findFirst()
-                    .orElseThrow(() -> new RestApiException("Match not found for order: " + matchRequest.getOrder()));
+            int matchIndex = (matchRequest.getOrder() - 1) / 2;
+            TournamentMatch match = matches.get(matchIndex);
 
             TeamTournamentParticipation team = teamParticipations.stream()
                     .filter(t -> t.getId().equals(matchRequest.getTeamId()))
                     .findFirst()
                     .orElseThrow(() -> new RestApiException("Team not found for ID: " + matchRequest.getTeamId()));
 
-            if (matchRequest.getOrder() % 2 == 1) {
+            if ((matchRequest.getOrder() - 1) % 2 == 0) {
                 match.setTeam1(team);
             } else {
                 match.setTeam2(team);
@@ -113,6 +110,16 @@ public class TournamentMatchServiceImpl implements TournamentMatchService {
         return modelMapper.map(match, TournamentMatchResponse.class);
     }
 
+    @Override
+    public List<TournamentMatchResponse> getTournamentMatches(FindTournamentMatch request) {
+        List<TournamentMatch> matches = matchRepository.findAllByTournamentId(request.getTournamentId());
+
+        return matches.stream()
+                .sorted(Comparator.comparing(TournamentMatch::getMatchOrder))
+                .map(match -> modelMapper.map(match, TournamentMatchResponse.class))
+                .collect(Collectors.toList());
+    }
+
     private int getMaxScore(MatchTypeEnum type) {
         return switch (type) {
             case BO1 -> 1;
@@ -124,16 +131,22 @@ public class TournamentMatchServiceImpl implements TournamentMatchService {
 
     @Scheduled(fixedRate = 300000) // 5 minutes
     @Transactional
+    @Override
     public void checkAndUpdateMatchStatus() {
         List<TournamentMatch> matches = matchRepository.findAll();
         LocalDateTime now = LocalDateTime.now();
 
         for (TournamentMatch match : matches) {
-            if (match.getEndDate().isBefore(now) && match.getStatus() == TournamentMatchStatusEnum.ONGOING) {
+            if(match.getStartDate().isBefore(now) || match.getStartDate().equals(now)) {
+                match.setStatus(TournamentMatchStatusEnum.ONGOING);
+                matchRepository.save(match);
+            }
+            if ((match.getEndDate().isBefore(now)||match.getEndDate().equals(now)) && match.getStatus() == TournamentMatchStatusEnum.ONGOING) {
                 match.setStatus(TournamentMatchStatusEnum.ENDED);
                 matchRepository.save(match);
 
-                if (match.getStage() != MatchStageEnum.FINALS) {
+                if(match.getStage()==MatchStageEnum.THIRD_PLACE){ updateThirdPlaceMatch(match); }
+                else if (match.getStage() != MatchStageEnum.FINALS) {
                     updateNextMatch(match);
                 } else {
                     endTournament(match.getTournament());
@@ -142,45 +155,137 @@ public class TournamentMatchServiceImpl implements TournamentMatchService {
         }
     }
 
+    private void updateThirdPlaceMatch (TournamentMatch match) {
+        if (Objects.equals(match.getTeam1Score(), match.getTeam2Score())) {
+            // Nếu hòa, cộng thêm 1 điểm cho một đội ngẫu nhiên
+            if (Math.random() < 0.5) {
+                match.setTeam1Score(match.getTeam1Score() + 1);
+            } else {
+                match.setTeam2Score(match.getTeam2Score() + 1);
+            }
+        }
+
+        if (match.getTeam1Score() > match.getTeam2Score()) {
+            match.getTeam2().setPlace(4);
+            match.getTeam1().setPlace(3);
+        } else {
+            match.getTeam1().setPlace(4);
+            match.getTeam2().setPlace(3);
+        }
+
+        matchRepository.save(match);
+        teamTournamentParticipationRepository.save(match.getTeam1());
+        teamTournamentParticipationRepository.save(match.getTeam2());
+    }
+
     private void updateNextMatch(TournamentMatch match) {
         Tournament tournament = match.getTournament();
         List<TournamentMatch> matches = matchRepository.findAllByTournamentId(tournament.getId());
 
-        int nextMatchOrder = getNextMatchOrder(match.getMatchOrder(), matches.size());
+        int nextMatchOrder = getNextMatchOrder(match.getMatchOrder(), matches.size(), tournament.isThirdPlaceMatch());
         TournamentMatch nextMatch = matches.stream()
                 .filter(m -> m.getMatchOrder() == nextMatchOrder)
                 .findFirst()
                 .orElseThrow(() -> new RestApiException("Next match not found"));
 
-        if (match.getTeam1Score() > match.getTeam2Score()) {
-            nextMatch.setTeam1(match.getTeam1());
-        } else if (match.getTeam2Score() > match.getTeam1Score()) {
-            nextMatch.setTeam2(match.getTeam2());
+        if (Objects.equals(match.getTeam1Score(), match.getTeam2Score())) {
+            // Nếu hòa, cộng thêm 1 điểm cho một đội ngẫu nhiên
+            if (Math.random() < 0.5) {
+                match.setTeam1Score(match.getTeam1Score() + 1);
+            } else {
+                match.setTeam2Score(match.getTeam2Score() + 1);
+            }
+        }
+
+        if (match.getStage() == MatchStageEnum.SEMI_FINALS && tournament.isThirdPlaceMatch()) {
+            int thirdPlaceMatchOrder = matches.size() - 1;
+            TournamentMatch thirdPlaceMatch = matches.stream()
+                    .filter(m -> m.getMatchOrder() == thirdPlaceMatchOrder)
+                    .findFirst()
+                    .orElse(null);
+
+            if (thirdPlaceMatch != null) {
+                if (match.getTeam1Score() > match.getTeam2Score()) {
+                    thirdPlaceMatch.setTeam2(match.getTeam2());
+                } else {
+                    thirdPlaceMatch.setTeam1(match.getTeam1());
+                }
+                matchRepository.save(thirdPlaceMatch);
+            }
         } else {
-            Random random = new Random();
-            if (random.nextBoolean()) {
+            if (match.getStage() == MatchStageEnum.ROUND_OF_16) {
+                if (match.getTeam1Score() > match.getTeam2Score()) {
+                    match.getTeam2().setPlace(16);
+                } else {
+                    match.getTeam1().setPlace(16);
+                }
+            } else if (match.getStage() == MatchStageEnum.QUARTER_FINALS) {
+                if (match.getTeam1Score() > match.getTeam2Score()) {
+                    match.getTeam2().setPlace(8);
+                } else {
+                    match.getTeam1().setPlace(8);
+                }
+            } else if (match.getStage() == MatchStageEnum.SEMI_FINALS) {
+                if (match.getTeam1Score() > match.getTeam2Score()) {
+                    match.getTeam2().setPlace(4);
+                } else {
+                    match.getTeam1().setPlace(4);
+                }
+            }
+
+            if (match.getTeam1Score() > match.getTeam2Score()) {
                 nextMatch.setTeam1(match.getTeam1());
             } else {
                 nextMatch.setTeam2(match.getTeam2());
             }
+            matchRepository.save(nextMatch);
         }
 
-        matchRepository.save(nextMatch);
+        matchRepository.save(match);
+        teamTournamentParticipationRepository.save(match.getTeam1());
+        teamTournamentParticipationRepository.save(match.getTeam2());
     }
 
-    private int getNextMatchOrder(int currentOrder, int totalMatches) {
-        if (totalMatches == 3) {
-            return 3;
-        } else if (totalMatches == 7) {
-            if (currentOrder < 4) {
-                return 5 + (currentOrder / 2);
+
+
+    private int getNextMatchOrder(int currentOrder, int totalMatches, boolean hasThirdPlaceMatch) {
+        int finalMatchOrder = totalMatches; // Trận chung kết luôn là trận cuối cùng
+        int thirdPlaceMatchOrder = hasThirdPlaceMatch ? totalMatches - 1 : -1; // Trận tranh hạng 3 nếu có
+
+        if (hasThirdPlaceMatch) {
+            totalMatches -= 1; // Loại trận tranh hạng 3 khỏi tổng số trận chính
+        }
+
+        if (totalMatches == 3) { // Giải đấu có 4 đội (bán kết -> chung kết)
+            if (currentOrder < 2) {
+                return 3; // Trận chung kết
             } else {
-                return 7;
+                return finalMatchOrder;
+            }
+        } else if (totalMatches == 7) { // Giải đấu có 8 đội
+            if (currentOrder < 4) {
+                return 5 + (currentOrder / 2); // Tứ kết -> Bán kết
+            } else if (currentOrder < 6) {
+                return finalMatchOrder; // Chung kết
+            } else {
+                return thirdPlaceMatchOrder; // Tranh hạng 3 nếu có
+            }
+        } else if (totalMatches == 15) { // Giải đấu có 16 đội
+            if (currentOrder < 8) {
+                return 9 + (currentOrder / 2); // Vòng 1/8 -> Tứ kết
+            } else if (currentOrder < 12) {
+                return 13 + (currentOrder / 2); // Tứ kết -> Bán kết
+            } else if (currentOrder < 14) {
+                return finalMatchOrder; // Chung kết
+            } else {
+                return thirdPlaceMatchOrder; // Tranh hạng 3 nếu có
             }
         } else {
             throw new IllegalArgumentException("Unsupported number of matches: " + totalMatches);
         }
     }
+
+
 
     private void endTournament(Tournament tournament) {
         tournament.setStatus("ENDED");
@@ -192,9 +297,7 @@ public class TournamentMatchServiceImpl implements TournamentMatchService {
             teamTournamentParticipationRepository.save(participation);
         }
 
-        if (tournament.getTop1Prize() != null && tournament.getTop1Prize() > 0 && tournament.getTop2Prize() != null && tournament.getTop2Prize() > 0) {
-            distributeTopPrizes(tournament, participations);
-        }
+        distributeTopPrizes(tournament, participations);
     }
 
     private void distributeTopPrizes(Tournament tournament, List<TeamTournamentParticipation> participations) {
@@ -206,19 +309,41 @@ public class TournamentMatchServiceImpl implements TournamentMatchService {
         TeamTournamentParticipation winningTeam;
         TeamTournamentParticipation losingTeam;
 
+        if (Objects.equals(finalMatch.getTeam1Score(), finalMatch.getTeam2Score())) {
+            // Nếu hòa, cộng thêm 1 điểm cho một đội ngẫu nhiên
+            if (Math.random() < 0.5) {
+                finalMatch.setTeam1Score(finalMatch.getTeam1Score() + 1);
+            } else {
+                finalMatch.setTeam2Score(finalMatch.getTeam2Score() + 1);
+            }
+            matchRepository.save(finalMatch);
+        }
+
         if (finalMatch.getTeam1Score() > finalMatch.getTeam2Score()) {
             winningTeam = finalMatch.getTeam1();
             losingTeam = finalMatch.getTeam2();
+            losingTeam.setPlace(2);
         } else {
             winningTeam = finalMatch.getTeam2();
             losingTeam = finalMatch.getTeam1();
+            losingTeam.setPlace(2);
         }
 
-        int top1Prize = tournament.getTop1Prize();
-        int top2Prize = tournament.getTop2Prize();
+        winningTeam.setPlace(1);
 
-        updateTeamPoints(winningTeam, top1Prize);
-        updateTeamPoints(losingTeam, top2Prize);
+
+        teamTournamentParticipationRepository.save(winningTeam);
+        teamTournamentParticipationRepository.save(losingTeam);
+
+        if(tournament.getTop1Prize()!=null && tournament.getTop2Prize()!=null && tournament.getTop1Prize()>0 && tournament.getTop2Prize()>0){
+            int top1Prize = tournament.getTop1Prize();
+            int top2Prize = tournament.getTop2Prize();
+
+            updateTeamPoints(winningTeam, top1Prize);
+            updateTeamPoints(losingTeam, top2Prize);
+
+        }
+
     }
 
     private void updateTeamPoints(TeamTournamentParticipation team, int prize) {

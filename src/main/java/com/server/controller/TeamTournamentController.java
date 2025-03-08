@@ -52,4 +52,6 @@ public class TeamTournamentController {
         TeamTournamentImageResponse response = teamTournamentService.uploadImage(file, teamId);
         return new ResponseGlobal<>(response);
     }
+
+
 }

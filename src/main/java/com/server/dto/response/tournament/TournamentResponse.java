@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -12,7 +14,7 @@ import lombok.Setter;
 public class TournamentResponse {
     private String id;
     private String name;
-    private int numberOfTeam;
+    private Integer numberOfTeam;
     private boolean flagDisplay;
     private String description;
     private String link;
@@ -23,4 +25,10 @@ public class TournamentResponse {
     private Integer top2Prize;
     private Integer top4Prize;
     private Integer teamMemberCount;
+    private boolean thirdPlaceMatch;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+    private String userCreate;
+    private String userUpdate;
+    private String streamLink;
 }

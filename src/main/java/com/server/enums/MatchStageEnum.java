@@ -10,7 +10,10 @@ public enum MatchStageEnum {
 
     QUARTER_FINALS(1, "QUARTER_FINALS"),
     SEMI_FINALS(2, "SEMI_FINALS"),
-    FINALS(3, "FINALS");
+    FINALS(3, "FINALS"),
+    ROUND_OF_16(4, "ROUND_OF_16"),
+    THIRD_PLACE(5, "THIRD_PLACE");
+
 
     private final int value;
     private final String stage;
