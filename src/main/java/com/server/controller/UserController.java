@@ -1,5 +1,6 @@
 package com.server.controller;
 
+import com.server.config.security.JwtUtils;
 import com.server.dto.request.user.CreateUserRequest;
 import com.server.dto.request.user.FindUserByIdRequest;
 import com.server.dto.request.user.FindUserRequest;
@@ -8,7 +9,9 @@ import com.server.dto.response.common.PageableObject;
 import com.server.dto.response.common.ResponseGlobal;
 import com.server.dto.response.user.UserImageResponse;
 import com.server.dto.response.user.UserResponse;
+import com.server.exceptions.UnauthorizedException;
 import com.server.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +33,7 @@ import org.springframework.http.HttpHeaders;
 public class UserController {
 
     private final UserService userService;
+    private final JwtUtils jwtUtils;
 
     /**
      * Tìm kiếm người dùng dựa trên các tham số tìm kiếm.
@@ -85,8 +89,15 @@ public class UserController {
 
     @PostMapping("/update-user-image")
     public ResponseGlobal<UserImageResponse> uploadImage(@RequestParam("userId") String id,
-                                                         @RequestParam("file") MultipartFile avatar) throws IOException {
+                                                         @RequestParam("file") MultipartFile avatar,
+                                                         HttpServletRequest request) throws IOException {
         log.info("Upload image request: {}", avatar.getOriginalFilename());
+        // Get authenticated user's ID from JWT token
+        String jwt = jwtUtils.getJwtFromHeader(request);
+        String authenticatedUserId = jwtUtils.getUserIdFromJwtToken(jwt);
+        if (!authenticatedUserId.equals(id)) {
+            throw new UnauthorizedException("You can only change your own avatar");
+        }
 
         return new ResponseGlobal<>(userService.uploadImage(avatar, id));
     }

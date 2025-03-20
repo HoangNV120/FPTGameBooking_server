@@ -1,5 +1,6 @@
 package com.server.controller;
 
+import com.server.config.security.JwtUtils;
 import com.server.dto.request.transaction.FindTransactionRequest;
 import com.server.dto.request.transaction.TransactionRequest;
 import com.server.dto.response.common.PageableObject;
@@ -7,8 +8,10 @@ import com.server.dto.response.common.ResponseGlobal;
 import com.server.dto.response.transaction.TransactionMinimalResponse;
 import com.server.dto.response.transaction.TransactionResponse;
 import com.server.dto.response.user.UserResponse;
+import com.server.exceptions.UnauthorizedException;
 import com.server.service.QrGenerateService;
 import com.server.service.TransactionService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,7 @@ public class TransactionRestController {
 
     private final QrGenerateService qrGenerateService;
     private final TransactionService transactionService;
+    private final JwtUtils jwtUtils;
 
     @PostMapping("/generate-qr")
     public ResponseGlobal<String> generateQr(@Valid @RequestBody TransactionRequest request) throws Exception {
@@ -36,8 +40,16 @@ public class TransactionRestController {
     }
 
     @PostMapping("/add-transaction")
-    public ResponseGlobal<TransactionResponse> addTransaction(@Valid @RequestBody TransactionRequest request) {
+    public ResponseGlobal<TransactionResponse> addTransaction(@Valid @RequestBody TransactionRequest request,
+                                                              HttpServletRequest httpServletRequest){
         log.info("Adding transaction: transaction = {}", request.toString());
+
+        String jwt = jwtUtils.getJwtFromHeader(httpServletRequest);
+        String authenticatedUserId = jwtUtils.getUserIdFromJwtToken(jwt);
+
+        if (!authenticatedUserId.equals(request.getUserId())) {
+            throw new UnauthorizedException("Không thể thêm giao dịch cho người dùng khác");
+        }
         return new ResponseGlobal<>(transactionService.addTransaction(request));
     }
 
@@ -55,8 +67,15 @@ public class TransactionRestController {
     }
 
     @PostMapping("/search-by-id")
-    public ResponseGlobal<PageableObject<TransactionMinimalResponse>> viewTransactionById(@RequestBody FindTransactionRequest request) {
+    public ResponseGlobal<PageableObject<TransactionMinimalResponse>> viewTransactionById(@RequestBody FindTransactionRequest request,
+                                                                                          HttpServletRequest httpServletRequest) {
         log.info("findTransaction: request = {}", request.toString());
+        String jwt = jwtUtils.getJwtFromHeader(httpServletRequest);
+        String authenticatedUserId = jwtUtils.getUserIdFromJwtToken(jwt);
+
+        if (!authenticatedUserId.equals(request.getUserId())) {
+            throw new UnauthorizedException(" Không thể xem giao dịch của người dùng khác");
+        }
         return new ResponseGlobal<>(transactionService.searchTransactionById(request));
     }
 

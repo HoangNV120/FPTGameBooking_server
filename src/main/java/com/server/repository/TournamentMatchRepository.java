@@ -1,6 +1,7 @@
 package com.server.repository;
 
 import com.server.entity.TournamentMatch;
+import com.server.enums.TournamentMatchStatusEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,5 +13,6 @@ import java.util.List;
 public interface TournamentMatchRepository extends JpaRepository<TournamentMatch, String> {
     @Query("SELECT m FROM TournamentMatch m WHERE m.tournament.id = :tournamentId ORDER BY m.startDate ASC")
     List<TournamentMatch> findAllByTournamentId(@Param("tournamentId") String tournamentId);
+    List<TournamentMatch> findAllByStatus(TournamentMatchStatusEnum status);
 
 }

@@ -114,6 +114,14 @@ public class GlobalExceptionHandler {
         }
     }
 
+    @ExceptionHandler({UnauthorizedException.class})
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    protected ResponseGlobal<String> handleUnauthorizedException(final UnauthorizedException ex) {
+        log.info("Unauthorized access attempt: {}", ex.getMessage());
+        return new ResponseGlobal<>(HttpStatus.UNAUTHORIZED.value(),
+                ex.getMessage(), ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
+    }
+
     public String getPropertyName(Path path) {
         String pathStr = path.toString();
         String[] comps = pathStr.split("\\.");

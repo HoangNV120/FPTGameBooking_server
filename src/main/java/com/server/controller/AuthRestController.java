@@ -8,13 +8,18 @@ import com.server.dto.response.auth.LoginResponse;
 import com.server.dto.response.auth.ProfileResponse;
 import com.server.dto.response.common.ResponseGlobal;
 import com.server.dto.response.user.UserResponse;
+import com.server.exceptions.RestApiException;
+import com.server.exceptions.UnauthorizedException;
 import com.server.service.AuthService;
 import com.server.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.security.Principal;
 
@@ -99,8 +104,17 @@ public class AuthRestController {
     }
 
     @PostMapping("/reset-password")
-    public ResponseGlobal<String> resetPassword(@Valid @RequestBody RestPassword req) {
+    public ResponseGlobal<String> resetPassword(@Valid @RequestBody RestPassword req, HttpServletRequest request) {
         log.info("resetPassword===> req = {} ", req);
+
+        // Get authenticated user's ID from JWT token
+        String jwt = jwtUtils.getJwtFromHeader(request);
+        String authenticatedUserId = jwtUtils.getUserIdFromJwtToken(jwt);
+
+        if (!authenticatedUserId.equals(req.getIdUser())) {
+            throw new UnauthorizedException("You can only change your own password");
+        }
+
         return new ResponseGlobal<>(authService.resetPassword(req));
     }
 

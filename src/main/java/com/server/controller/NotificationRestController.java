@@ -8,6 +8,7 @@ import com.server.dto.response.common.PageableObject;
 import com.server.dto.response.common.ResponseGlobal;
 import com.server.dto.response.notification.CountNotificationResponse;
 import com.server.dto.response.notification.NotificationResponse;
+import com.server.exceptions.UnauthorizedException;
 import com.server.service.NotificationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -37,9 +38,7 @@ public class NotificationRestController {
         String userIdFromJwt = jwtUtils.getUserIdFromJwtToken(jwt);
 
         if (!userIdFromJwt.equals(request.getUserId())) {
-            return new ResponseGlobal<>(HttpStatus.UNAUTHORIZED.value(),
-                    "Không thể truy cập vào thông báo của tài khoản khác",
-                    ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
+            throw new UnauthorizedException("Không thể truy cập vào thông báo của tài khoản khác");
         }
 
         return new ResponseGlobal<>(notificationService.findAll(request));
@@ -52,9 +51,7 @@ public class NotificationRestController {
         String userIdFromJwt = jwtUtils.getUserIdFromJwtToken(jwt);
 
         if (!userIdFromJwt.equals(request.getUserId())) {
-            return new ResponseGlobal<>(HttpStatus.UNAUTHORIZED.value(),
-                    "Không thể truy cập vào thông báo của tài khoản khác",
-                    ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
+            throw new UnauthorizedException(" Không thể truy cập vào thông báo của tài khoản khác");
         }
 
         return new ResponseGlobal<>(notificationService.countNotificationUnreadByUserId(request.getUserId()));
