@@ -1,5 +1,6 @@
 package com.server.service.impl;
 
+import com.server.dto.request.reels.reelRequest;
 import com.server.entity.Reel;
 import com.server.entity.User;
 import com.server.repository.ReelRepository;
@@ -37,11 +38,29 @@ public class ReelServiceImpl {
     }
 
     // Thêm một Reel mới, lấy họ tên từ tài khoản đăng nhập
-    public Reel addReel(String title, String video, String image) {
+    public Reel addReel(reelRequest request) {
         String fullName = getCurrentName(); // Lấy họ tên người dùng
 
-        Reel reel = new Reel(title, video, image, fullName);
+        Reel reel = new Reel(request.getTitle(), request.getVideo(), request.getImage(), fullName);
         return reelRepository.save(reel);
+    }
+
+    public Reel editReel(String id, reelRequest request) {
+        Reel reel = reelRepository.findById(id).orElse(null);
+        if (request.getTitle().trim() != null){
+            reel.setTitle(request.getTitle());
+        }
+        if (request.getVideo().trim() != null){
+            reel.setVideo(request.getVideo());
+        }
+        if (request.getImage().trim() != null){
+            reel.setImage(request.getImage());
+        }
+        return reelRepository.save(reel);
+    }
+
+    public void deleteReel(String id) {
+         reelRepository.deleteById(id);
     }
 
     // Lấy họ tên từ tài khoản đăng nhập hiện tại
@@ -59,4 +78,6 @@ public class ReelServiceImpl {
             return "Unknown User"; // Trường hợp không phải UserDetails
         }
     }
+
+
 }

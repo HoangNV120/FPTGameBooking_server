@@ -1,5 +1,7 @@
 package com.server.controller;
 
+import com.server.dto.request.reels.reelRequest;
+import com.server.dto.response.common.ResponseGlobal;
 import com.server.entity.Reel;
 import com.server.service.impl.ReelServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +31,19 @@ public class ReelController {
 
     // API thêm Reel mới (tự động lấy postedBy)
     @PostMapping("/add")
-    public Reel addReel(@RequestBody Map<String, String> request) {
-        String title = request.get("title");
-        String video = request.get("video");
-        String image = request.get("image");
+    public Reel addReel(@RequestBody reelRequest request) {
+        return reelService.addReel(request);
+    }
 
-        return reelService.addReel(title, video, image);
+    @PutMapping("/edit/{id}")
+    public ResponseGlobal<Reel> editReel(@PathVariable String id,@RequestBody reelRequest request) {
+        return new ResponseGlobal<>(reelService.editReel(id,request));
+    }
+
+    @PostMapping("/delete/{id}")
+    public ResponseGlobal<Void> deleteReelById(@PathVariable String id) {
+         reelService.deleteReel(id);
+         return new ResponseGlobal<>();
     }
 
     @GetMapping("/find-video-by-id/{id}")

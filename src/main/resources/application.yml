@@ -5,9 +5,9 @@ spring:
   # database connection
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://161.248.146.42:25100/db_gamebooking_dev?createDatabaseIfNotExist=true&serverTimezone=Asia/Ho_Chi_Minh
-    username: admin
-    password: admin123
+    url: jdbc:mysql://127.0.0.1:3306/fptgame?createDatabaseIfNotExist=true&serverTimezone=Asia/Ho_Chi_Minh
+    username: root
+    password: 123456
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5

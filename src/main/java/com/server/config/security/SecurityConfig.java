@@ -89,6 +89,7 @@ public class SecurityConfig {
             "/api/v1/system-stream-link/update",
             "/api/v1/user/exportToExcel",
             "/api/v1/transactions/exportToExcelTransactions",
+            "/api/v1/reels/add"
     };
 
     @Bean
