@@ -1,10 +1,12 @@
 package com.server.repository;
 
 import com.server.entity.Reel;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ReelRepository extends JpaRepository<Reel, String> {
-    // JpaRepository đã hỗ trợ các thao tác cần thiết
+
+    public List<Reel> findAllByFunnyMoment(String funnyMoment);
 }

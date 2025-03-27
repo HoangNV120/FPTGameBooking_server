@@ -29,10 +29,20 @@ public class ReelController {
         return reelService.getAllReels();
     }
 
+    @GetMapping("/view2")
+    public List<Reel> getAllReelsByPremier() {
+        return reelService.getAllReelsByPremier();
+    }
+
     // API thêm Reel mới (tự động lấy postedBy)
     @PostMapping("/add")
     public Reel addReel(@RequestBody reelRequest request) {
         return reelService.addReel(request);
+    }
+
+    @PostMapping("/add2")
+    public Reel addReelPremier(@RequestBody reelRequest request) {
+        return reelService.addReelPremier(request);
     }
 
     @PutMapping("/edit/{id}")

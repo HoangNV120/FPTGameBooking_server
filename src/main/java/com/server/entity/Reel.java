@@ -30,6 +30,9 @@ public class Reel {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd HH:mm:ss", timezone = "Asia/Ho_Chi_Minh")
     private Date postedDate;
 
+    @Column(name = "funnymoment")
+    private String funnyMoment;
+
     // Constructor để khởi tạo với title, video, image, postedBy
     public Reel(String title, String video, String image, String postedBy) {
         this.id = UUID.randomUUID().toString(); // Tự động tạo UUID
@@ -40,6 +43,15 @@ public class Reel {
         this.postedDate = new Date(); // Gán ngày đăng hiện tại
     }
 
+    public Reel(String title, String video, String image, String postedBy, String funnyMoment) {
+        this.id = UUID.randomUUID().toString(); // Tự động tạo UUID
+        this.title = title;
+        this.video = video;
+        this.image = image;
+        this.postedBy = postedBy;
+        this.postedDate = postedDate;
+        this.funnyMoment = funnyMoment;
+    }
 
     public String getId() {
         return this.id;

@@ -46,6 +46,7 @@ public class SecurityConfig {
             "/api/v1/game/**",
             "/api/v1/system-stream-link/view",
             "/api/v1/reels/view",
+            "/api/v1/reels/view2",
             "/api/v1/reels/find-video-by-id/**",
             "/api/v1/tournament/view",
             "/api/v1/tournament/{id}",
@@ -89,7 +90,8 @@ public class SecurityConfig {
             "/api/v1/system-stream-link/update",
             "/api/v1/user/exportToExcel",
             "/api/v1/transactions/exportToExcelTransactions",
-            "/api/v1/reels/add"
+            "/api/v1/reels/add",
+            "/api/v1/reels/add2"
     };
 
     @Bean

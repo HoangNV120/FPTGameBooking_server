@@ -29,7 +29,12 @@ public class ReelServiceImpl {
 
     // Lấy tất cả Reel
     public List<Reel> getAllReels() {
-        return reelRepository.findAll();
+        return reelRepository.findAllByFunnyMoment("1");
+    }
+
+    public List<Reel> getAllReelsByPremier() {
+        List<Reel> list = reelRepository.findAllByFunnyMoment("2");
+        return list;
     }
 
     // Lấy Reel theo ID (kiểu String)
@@ -41,7 +46,14 @@ public class ReelServiceImpl {
     public Reel addReel(reelRequest request) {
         String fullName = getCurrentName(); // Lấy họ tên người dùng
 
-        Reel reel = new Reel(request.getTitle(), request.getVideo(), request.getImage(), fullName);
+        Reel reel = new Reel(request.getTitle(), request.getVideo(), request.getImage(), fullName, "1");
+        return reelRepository.save(reel);
+    }
+
+    public Reel addReelPremier(reelRequest request) {
+        String fullName = getCurrentName(); // Lấy họ tên người dùng
+
+        Reel reel = new Reel(request.getTitle(), request.getVideo(), request.getImage(), fullName, "2");
         return reelRepository.save(reel);
     }
 
